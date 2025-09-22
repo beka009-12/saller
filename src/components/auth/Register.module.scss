@@ -1,0 +1,39 @@
+.Auth {
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    justify-content: center;
+    height: 100dvh;
+    gap: 20px;
+    .form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      width: 560px;
+      gap: 30px;
+      height: 360px;
+      .inputs {
+        padding: 10px;
+        width: 100%;
+        font-size: 20px;
+      }
+      button {
+        width: 100%;
+        height: 50px;
+        font-size: 20px;
+        background-color: #ff7a00;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        &:hover {
+          background-color: #ee7503;
+        }
+      }
+    }
+  }
+}

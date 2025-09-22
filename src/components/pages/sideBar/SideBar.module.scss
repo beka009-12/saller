@@ -1,0 +1,256 @@
+.SideBar {
+  width: 280px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-right: 1px solid #e2e8f0;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 24px 20px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+      background: #94a3b8;
+    }
+  }
+
+  &.collapsed {
+    width: 75px;
+    padding: 24px 12px;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #f1f5f9;
+
+      .title {
+        font-size: 26px;
+        font-weight: 700;
+        text-align: left;
+        user-select: none;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #1e293b;
+        letter-spacing: -0.5px;
+
+        span {
+          font-weight: 900;
+          color: #fb4517;
+          text-shadow: 0 2px 4px rgba(251, 69, 23, 0.2);
+        }
+      }
+
+      .toggleBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+        min-width: 40px;
+        height: 40px;
+
+        &:hover {
+          background: #0000000d;
+
+          font-weight: 700;
+          transform: scale(1.05);
+          box-shadow: 0 4px 15px rgba(52, 45, 68, 0.068);
+        }
+
+        .toggleIcon {
+          width: 18px;
+          height: 18px;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .path {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+
+      .label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 16px 12px 8px 12px;
+        margin-top: 16px;
+        border-top: 1px solid #f1f5f9;
+        transition: opacity 0.3s ease;
+
+        &:first-child {
+          margin-top: 0;
+          border-top: none;
+        }
+      }
+
+      .rout {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        padding: 14px 12px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        margin: 2px 0;
+
+        &:hover {
+          background: #0000000d;
+
+          .icon {
+            color: white;
+            transform: scale(1.1);
+          }
+
+          .text {
+            color: #000;
+          }
+        }
+
+        &.active {
+          background: linear-gradient(135deg, #fb4517 0%, #ff6b47 100%);
+          transform: translateX(4px);
+          color: white;
+          box-shadow: 0 4px 20px rgba(251, 69, 23, 0.25);
+
+          .icon {
+            stroke: #fff;
+            stroke-width: 2;
+          }
+
+          .text {
+            color: white;
+          }
+        }
+
+        .icon {
+          width: 20px;
+          height: 20px;
+          color: #64748b;
+          flex-shrink: 0;
+          transition: all 0.3s ease;
+        }
+
+        .text {
+          font-size: 15px;
+          color: #334155;
+          margin: 0;
+          white-space: nowrap;
+          transition: all 0.3s ease;
+          font-weight: 400;
+        }
+
+        .tooltip {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Состояние когда sidebar свернут
+  &.collapsed {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .container {
+      .rout {
+        gap: 0;
+      }
+      .logo {
+        justify-content: center;
+
+        .toggleBtn {
+          .toggleIcon {
+            transform: rotate(0deg);
+          }
+        }
+
+        .title {
+          opacity: 0;
+          visibility: hidden;
+          width: 0;
+        }
+      }
+
+      .path {
+        .label {
+          opacity: 0;
+          visibility: hidden;
+          height: 0;
+          padding: 0;
+          margin: 0;
+        }
+
+        .rout {
+          justify-content: center;
+          padding: 14px;
+
+          .text {
+            opacity: 0;
+            visibility: hidden;
+            width: 0;
+          }
+
+          &:hover {
+            .tooltip {
+              opacity: 1;
+              visibility: visible;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+
+    &.open {
+      transform: translateX(0);
+    }
+
+    &.collapsed {
+      transform: translateX(-100%);
+    }
+  }
+}

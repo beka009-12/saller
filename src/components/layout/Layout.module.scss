@@ -1,0 +1,53 @@
+.Layout {
+  display: flex;
+  align-items: start;
+  min-height: 100vh;
+
+  .sideBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+  }
+
+  .LayoutContent {
+    flex: 1;
+    display: flex;
+    min-height: 100dvh;
+    padding-inline: 10px;
+    flex-direction: column;
+    margin-left: 300px;
+    transition: margin-left 0.3s ease;
+
+    &.collapsed {
+      margin-left: 80px;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    footer {
+      margin-top: auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .LayoutContent {
+      margin-left: 0;
+
+      &.collapsed {
+        margin-left: 0;
+      }
+    }
+
+    .sideBar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+
+      &.open {
+        transform: translateX(0);
+      }
+    }
+  }
+}

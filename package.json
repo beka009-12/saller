@@ -12,6 +12,7 @@
     "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-query-devtools": "^5.89.0",
     "axios": "^1.12.2",
+    "framer-motion": "^12.23.18",
     "motion": "^12.23.16",
     "next": "15.5.3",
     "react": "19.1.0",

@@ -1,91 +1,71 @@
 "use client";
 import { useState, type FC } from "react";
 import scss from "./Header.module.scss";
+import { useGetMe } from "@/api/user";
 
 const Header: FC = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { data: seller } = useGetMe();
+  console.log(seller);
 
   return (
-    <div className={scss.header}>
-      <div className={scss.welcomeInfo}>
-        <h1 className={scss.title}>
-          Добро пожаловать, <span>Партнёр!</span>
-        </h1>
-        <p className={scss.subtitle}>
-          Здесь вы можете управлять товарами, следить за заказами и отзывами
-          клиентов
-        </p>
-      </div>
+    <header className={scss.header}>
+      {/* Logo or Brand */}
+      <div className={scss.logo}>Панель управления</div>
 
-      {/* Profile info */}
-      <div className={scss.profileSection}>
-        <div
-          className={scss.profileCard}
+      {/* Profile Section */}
+      <div className={scss.profileContainer}>
+        <button
           onClick={() => setShowProfileMenu(!showProfileMenu)}
+          className={scss.profileButton}
         >
-          <div className={scss.avatar}>
-            <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-              alt="Profile avatar"
-            />
-            <div className={scss.statusIndicator}></div>
-          </div>
-          <div className={scss.profileInfo}>
-            <h3>Shop Dream</h3>
-            <p>ID: #SP2024</p>
-          </div>
+          <img
+            src={
+              seller?.user.avatar
+                ? seller.user.avatar
+                : "https://miro.medium.com/v2/resize:fit:720/1*W35QUSvGpcLuxPo3SRTH4w.png"
+            }
+            alt="Seller Avatar"
+            className={scss.avatar}
+          />
+
+          <span className={scss.sellerName}>{seller?.user.name}</span>
           <svg
-            className={`${scss.chevron} ${showProfileMenu ? scss.rotated : ""}`}
-            viewBox="0 0 24 24"
+            className={scss.dropdownIcon}
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <polyline points="6 9 12 15 18 9"></polyline>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
-        </div>
+        </button>
+
+        {/* Profile Dropdown */}
         {showProfileMenu && (
-          <div className={scss.profileMenu}>
-            <div className={scss.menuItem}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              Мой профиль
+          <div className={scss.dropdownMenu}>
+            <div className={scss.dropdownInfo}>
+              <p className={scss.sellerName}>{seller?.user.name}</p>
+              <p className={scss.sellerEmail}>{seller?.user.email}</p>
             </div>
-            <div className={scss.menuItem}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
+            <a href="/profile" className={scss.dropdownItem}>
+              Посмотреть профиль
+            </a>
+            <a href="/setting" className={scss.dropdownItem}>
               Настройки
-            </div>
-            <div className={scss.menuItem}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
+            </a>
+            <a href="/logout" className={scss.dropdownItemLogout}>
               Выйти
-            </div>
+            </a>
           </div>
         )}
       </div>
-    </div>
+    </header>
   );
 };
 

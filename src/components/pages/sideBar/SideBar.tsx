@@ -1,7 +1,8 @@
+"use client";
 import { useState, useEffect, type FC } from "react";
 import scss from "./SideBar.module.scss";
 import { SideBarIcons } from "@/utils/sideBarIcons/Icons";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface SideBarProps {
   onToggle?: (collapsed: boolean) => void;
@@ -9,8 +10,9 @@ interface SideBarProps {
 
 const SideBar: FC<SideBarProps> = ({ onToggle }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [activeRoute, setActiveRoute] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const [activePath, setActivePath] = useState<string | null>(null);
 
   const toggleSidebar = () => {
     const newCollapsed = !isCollapsed;
@@ -21,9 +23,9 @@ const SideBar: FC<SideBarProps> = ({ onToggle }) => {
     }
   };
 
-  const handleRouteClick = (routeName: string) => {
-    setActiveRoute(routeName);
-  };
+  useEffect(() => {
+    setActivePath(pathname);
+  }, [pathname]);
 
   useEffect(() => {
     if (onToggle) {
@@ -58,13 +60,13 @@ const SideBar: FC<SideBarProps> = ({ onToggle }) => {
 
         <div className={scss.path}>
           {!isCollapsed && <span className={scss.label}>Главное</span>}
+
+          {/* Главное */}
           <div
             className={`${scss.rout} ${
-              activeRoute === "home" ? scss.active : ""
+              activePath === "/saller-page" ? scss.active : ""
             }`}
-            onClick={() => (
-              handleRouteClick("home"), router.push("/saller-page")
-            )}
+            onClick={() => router.push("/saller-page")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -88,11 +90,13 @@ const SideBar: FC<SideBarProps> = ({ onToggle }) => {
           {!isCollapsed && (
             <span className={scss.label}>Работа с клиентами</span>
           )}
+
+          {/* Отзывы */}
           <div
             className={`${scss.rout} ${
-              activeRoute === "reviews" ? scss.active : ""
+              activePath === "/reviews" ? scss.active : ""
             }`}
-            onClick={() => handleRouteClick("reviews")}
+            onClick={() => router.push("/reviews")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -114,13 +118,13 @@ const SideBar: FC<SideBarProps> = ({ onToggle }) => {
           </div>
 
           {!isCollapsed && <span className={scss.label}>Управление</span>}
+
+          {/* Настройки */}
           <div
             className={`${scss.rout} ${
-              activeRoute === "settings" ? scss.active : ""
+              activePath === "/setting" ? scss.active : ""
             }`}
-            onClick={() => (
-              handleRouteClick("settings"), router.push("/setting")
-            )}
+            onClick={() => router.push("/setting")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -145,16 +149,15 @@ const SideBar: FC<SideBarProps> = ({ onToggle }) => {
             {isCollapsed && <div className={scss.tooltip}>Настройки</div>}
           </div>
 
-          {/* УБРАНО: Блок аналитики */}
-
+          {/* Товары */}
           {!isCollapsed && <span className={scss.label}>Мои товары</span>}
           {SideBarIcons.map((item, index) => (
             <div
-              className={`${scss.rout} ${
-                activeRoute === `product-${index}` ? scss.active : ""
-              }`}
               key={index}
-              onClick={() => handleRouteClick(`product-${index}`)}
+              className={`${scss.rout} ${
+                activePath === item.path ? scss.active : ""
+              }`}
+              onClick={() => router.push(item.path)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +174,7 @@ const SideBar: FC<SideBarProps> = ({ onToggle }) => {
                 />
               </svg>
               <p className={scss.text}>{item.title}</p>
-              {isCollapsed && <div className={scss.tooltip}></div>}
+              {isCollapsed && <div className={scss.tooltip}>{item.title}</div>}
             </div>
           ))}
         </div>

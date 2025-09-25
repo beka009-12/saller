@@ -2,13 +2,10 @@
 import { type FC, useState } from "react";
 import scss from "./Home.module.scss";
 import CountUp from "@/utils/anim/CountUp";
-import Header from "@/components/layout/header/Header";
 
 const Home: FC = () => {
   return (
     <section className={scss.Home}>
-      {/* Header с профилем */}
-      <Header />
       <div className={scss.content}>
         {/* Статистика */}
         <div className={scss.stats}>

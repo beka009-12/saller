@@ -1,0 +1,85 @@
+.AuthStote {
+  padding: 60px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  max-width: 500px;
+  width: 100%;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input,
+.textarea {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e2e2;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: #6366f1;
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primaryBtn {
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: #6366f1;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.primaryBtn:hover {
+  background: #4f46e5;
+}
+
+.secondaryBtn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #dcdcdc;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+
+.secondaryBtn:hover {
+  background: #f1f1f1;
+}
+
+.error {
+  color: #ef4444;
+  font-size: 12px;
+}

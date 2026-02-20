@@ -30,10 +30,11 @@ const Authentication: FC = () => {
   const onRegister: SubmitHandler<AUTH.RegisterReq> = async (formData) => {
     try {
       const response = await signUpMutate(formData);
+
       resetSignUp();
       toast.success("Регистрация успешна!");
       localStorage.setItem("token", response.token);
-      router.push("/auth/store");
+      router.push("/store");
     } catch (error: any) {
       console.error("Ошибка регистрации:", error);
       toast.error("Не удалось зарегистрироваться. Попробуйте снова.");
@@ -43,10 +44,16 @@ const Authentication: FC = () => {
   const onLogin: SubmitHandler<AUTH.LoginReq> = async (formData) => {
     try {
       const response = await signInMutate(formData);
-      resetSignIn();
-      toast.success("Вход выполнен!");
-      localStorage.setItem("token", response.token);
-      router.push("/");
+
+      if (response.user?.role.toLowerCase() !== "owner") {
+        toast.error("Доступ только для владельцев магазинов.");
+        return;
+      } else {
+        resetSignIn();
+        toast.success("Вход выполнен!");
+        localStorage.setItem("token", response.token);
+        router.push("/");
+      }
     } catch (error: any) {
       console.error("Ошибка входа:", error);
       toast.error("Не удалось войти. Проверьте email и пароль.");
@@ -74,6 +81,7 @@ const Authentication: FC = () => {
                   type="email"
                   placeholder="Email"
                 />
+                {}
                 <input
                   className={scss.inputs}
                   {...registerSignIn("password")}

@@ -4,7 +4,7 @@ import { api } from "..";
 const useSignUp = () => {
   return useMutation<AUTH.RegisterRes, Error, AUTH.RegisterReq>({
     mutationFn: async (data) => {
-      const response = await api.post("/auth/sign-up-saller", data);
+      const response = await api.post("/saller/sign-up-saller", data);
       return response.data;
     },
   });
@@ -13,17 +13,17 @@ const useSignUp = () => {
 const useSignIn = () => {
   return useMutation<AUTH.LoginRes, Error, AUTH.LoginReq>({
     mutationFn: async (data) => {
-      const response = await api.post("/auth/sign-in-saller", data);
+      const response = await api.post("/saller/sign-in-saller", data);
       return response.data;
     },
   });
 };
 
 const useGetCurrentUser = () => {
-  return useQuery<AUTH.CurrentUserRes, Error, AUTH.CurrentUserReq>({
+  return useQuery<AUTH.CurrentUserRes, AUTH.CurrentUserReq>({
     queryKey: ["currentUser"],
     queryFn: async () => {
-      const response = await api.get("/auth/saller-profile");
+      const response = await api.get("/saller/saller-profile");
       return response.data;
     },
   });
@@ -33,7 +33,7 @@ const useGetCurrentUser = () => {
 const useAuthStore = () => {
   return useMutation<AUTH.CreateStoreRes, Error, AUTH.CreateStoreReq>({
     mutationFn: async (data) => {
-      const response = await api.post("/auth/create-store", data);
+      const response = await api.post("/saller/create-store", data);
       return response.data;
     },
   });

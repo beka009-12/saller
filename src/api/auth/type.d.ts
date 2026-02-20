@@ -25,8 +25,6 @@ interface Store {
   ownerId: number;
   owner?: User;
 
-  products?: Product[];
-
   createdAt: Date;
   updatedAt: Date;
 }

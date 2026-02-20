@@ -5,6 +5,7 @@ import scss from "./AuthStote.module.scss";
 import { useAuthStore } from "@/src/api/auth";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const AuthStore: FC = () => {
   const {
@@ -16,6 +17,7 @@ const AuthStore: FC = () => {
   } = useForm<AUTH.CreateStoreReq>();
 
   const { mutateAsync: createStore, isPending } = useAuthStore();
+  const router = useRouter();
 
   const [address, setAddress] = useState("");
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
@@ -35,6 +37,7 @@ const AuthStore: FC = () => {
       setCoords(null);
 
       toast.success("Магазин успешно создан 🚀");
+      router.push("/");
     } catch (error) {
       console.error(error);
       toast.error("Ошибка при создании магазина");

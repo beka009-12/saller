@@ -35,7 +35,7 @@ const Authentication: FC = () => {
       toast.success("Регистрация успешна!");
       localStorage.setItem("token", response.token);
       router.push("/store");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Ошибка регистрации:", error);
       toast.error("Не удалось зарегистрироваться. Попробуйте снова.");
     }
@@ -54,7 +54,7 @@ const Authentication: FC = () => {
         localStorage.setItem("token", response.token);
         router.push("/");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Ошибка входа:", error);
       toast.error("Не удалось войти. Проверьте email и пароль.");
     }

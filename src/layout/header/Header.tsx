@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect, type FC } from "react";
 import { useRouter } from "next/navigation";
@@ -27,8 +28,6 @@ const Header: FC = () => {
       router.replace("/register");
     }
   }, [isLoading, seller, isError, router]);
-
-  if (isLoading) return null;
 
   if (!seller) return null;
 
@@ -71,18 +70,24 @@ const Header: FC = () => {
             </a>
 
             <nav className={scss.nav}>
-              <a href="/" className={scss.navLink}>
+              <p onClick={() => router.push("/")} className={scss.navLink}>
                 <LayoutDashboard size={18} />
                 <span>Главная</span>
-              </a>
-              <a href="/products" className={scss.navLink}>
+              </p>
+              <p
+                onClick={() => router.push("/products")}
+                className={scss.navLink}
+              >
                 <Package size={18} />
                 <span>Товары</span>
-              </a>
-              <a href="/orders" className={scss.navLink}>
+              </p>
+              <p
+                onClick={() => router.push("/orders")}
+                className={scss.navLink}
+              >
                 <ShoppingBag size={18} />
                 <span>Заказы</span>
-              </a>
+              </p>
             </nav>
           </div>
 

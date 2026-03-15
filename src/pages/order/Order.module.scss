@@ -1,0 +1,386 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+$bg: #ffffff;
+$white: #ffffff;
+$border: #e4e4e0;
+$text: #111110;
+$muted: #888884;
+$radius: 6px;
+
+.Order {
+  min-height: 100vh;
+  background: $bg;
+  font-family: "Inter", sans-serif;
+  color: $text;
+  font-size: 14px;
+  padding: 36px 0 80px;
+  * {
+    box-sizing: border-box;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 20px;
+}
+
+.statNum {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: $muted;
+  white-space: nowrap;
+}
+
+.statDivider {
+  width: 1px;
+  height: 36px;
+  background: $border;
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+.filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid $border;
+  border-radius: 20px;
+  background: $white;
+  font-family: inherit;
+  font-size: 13px;
+  color: $muted;
+  cursor: pointer;
+  transition: all 0.12s;
+
+  &:hover {
+    border-color: #bbb;
+    color: $text;
+  }
+}
+
+.filterActive {
+  background: $text;
+  border-color: $text;
+  color: $white;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: $border;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: $text;
+}
+
+.badgeActive {
+  background: rgba(255, 255, 255, 0.25);
+  color: $white;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+.table {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+}
+
+.tableHead {
+  display: grid;
+  grid-template-columns: 70px 160px 1fr 180px 110px 110px 32px;
+  padding: 10px 16px;
+  border-bottom: 1px solid $border;
+  background: $bg;
+
+  span {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: $muted;
+  }
+}
+
+.rowWrap {
+  border-bottom: 1px solid $border;
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 70px 160px 1fr 180px 110px 110px 32px;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+  gap: 0;
+
+  &:hover {
+    background: #00000008;
+  }
+}
+
+.rowOpen {
+  background: #fafaf8;
+  border-bottom: 1px solid $border;
+}
+
+.orderId {
+  font-size: 13px;
+  font-weight: 600;
+  color: $muted;
+}
+
+.buyer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  b {
+    font-weight: 500;
+    font-size: 14px;
+  }
+  small {
+    font-size: 12px;
+    color: $muted;
+  }
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.itemChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+
+  em {
+    font-style: normal;
+    font-weight: 600;
+    color: $muted;
+  }
+}
+
+.address {
+  font-size: 13px;
+  color: $muted;
+  line-height: 1.4;
+  padding-right: 8px;
+}
+
+.total {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+// ── Status badges ─────────────────────────────────────────────────────────────
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.s_PENDING {
+  background: #fff8e1;
+  color: #b45309;
+}
+.s_PAID {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.s_SHIPPED {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+.s_COMPLETED {
+  background: #dcfce7;
+  color: #15803d;
+}
+.s_CANCELED {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.chevron {
+  font-size: 10px;
+  color: $muted;
+  text-align: right;
+}
+
+// ── Expanded Detail ───────────────────────────────────────────────────────────
+.detail {
+  padding: 20px 16px 20px 86px;
+  background: #faf9f8;
+  border-top: 1px solid $border;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 220px 1fr 200px;
+  gap: 32px;
+  align-items: start;
+}
+
+.detailBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dlabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: $muted;
+  margin: 0 0 6px;
+}
+
+.dval {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.dsub {
+  font-size: 13px;
+  color: $muted;
+  margin: 0;
+
+  b {
+    color: $text;
+    font-weight: 500;
+  }
+}
+
+// ── Items Table ───────────────────────────────────────────────────────────────
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  td {
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid $border;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.tdQty {
+  color: $muted;
+  text-align: center;
+  width: 60px;
+}
+
+.tdPrice {
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+  width: 100px;
+}
+
+.trTotal {
+  td {
+    font-weight: 600;
+    border-top: 1px solid $border;
+    border-bottom: none;
+    padding-top: 8px;
+    color: $text;
+  }
+}
+
+// ── Action button ─────────────────────────────────────────────────────────────
+.actionBtn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: $text;
+  color: $white;
+  border: none;
+  border-radius: $radius;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  width: 100%;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+// ── Empty ─────────────────────────────────────────────────────────────────────
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $muted;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+}

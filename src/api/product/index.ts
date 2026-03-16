@@ -1,19 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "..";
 
-const useCreateProduct = () => {
-  return useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await api.post("/commodity/create-product", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return response.data;
-    },
-  });
-};
-
 const useGetProducts = () => {
   return useQuery<GetProductsResponse>({
     queryKey: ["products"],
@@ -62,3 +49,5 @@ export {
   useUpdateProduct,
   useDeleteProduct,
 };
+
+

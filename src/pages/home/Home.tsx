@@ -2,12 +2,10 @@ import { FC } from "react";
 import {
   CreditCard,
   ShoppingBag,
-  Star,
   Plus,
   Package,
   Settings,
   AlertTriangle,
-  Wallet,
 } from "lucide-react";
 import scss from "./Home.module.scss";
 
@@ -33,104 +31,94 @@ const lowStockProducts = [
   { name: "Защитное стекло iPhone", stock: 7 },
 ];
 
+const STATUS_LABEL: Record<string, string> = {
+  PENDING: "Ожидает",
+  PAID: "Оплачен",
+  SHIPPED: "Отправлен",
+};
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat("ru-KG", {
+    style: "currency",
+    currency: "KGS",
+    maximumFractionDigits: 0,
+  }).format(n);
+
 const Home: FC = () => {
   return (
     <main className={scss.dashboard}>
       <div className="container">
+        {/* Header + stats */}
         <div className={scss.header}>
-          <h1 className={scss.title}>Панель продавца</h1>
-          <p className={scss.subtitle}>
-            Добро пожаловать! Вот ваша статистика за сегодня
-          </p>
-        </div>
-
-        {/* Метрики */}
-        <div className={scss.statsGrid}>
-          <div className={scss.statCard}>
-            <div className={scss.statIcon}>
-              <CreditCard size={24} />
-            </div>
-            <div className={scss.statValue}>{stats.todayOrders}</div>
-            <div className={scss.statLabel}>Заказов сегодня</div>
+          <div className={scss.headerLeft}>
+            <h1>Панель продавца</h1>
+            <p>Добро пожаловать! Вот ваша статистика за сегодня</p>
           </div>
 
-          <div className={scss.statCard}>
-            <div className={scss.statIcon}>
-              <Wallet size={24} />
+          <div className={scss.statsBar}>
+            <div className={scss.statItem}>
+              <span className={scss.statNum}>{stats.todayOrders}</span>
+              <span className={scss.statLabel}>Заказов сегодня</span>
             </div>
-            <div className={scss.statValue}>
-              {stats.todayRevenue.toLocaleString()} с
+            <div className={scss.statDivider} />
+            <div className={scss.statItem}>
+              <span className={scss.statNum}>{fmt(stats.todayRevenue)}</span>
+              <span className={scss.statLabel}>Выручка сегодня</span>
             </div>
-            <div className={scss.statLabel}>Выручка сегодня</div>
-          </div>
-
-          <div className={scss.statCard}>
-            <div className={scss.statIcon}>
-              <ShoppingBag size={24} />
+            <div className={scss.statDivider} />
+            <div className={scss.statItem}>
+              <span className={scss.statNum}>{stats.totalProducts}</span>
+              <span className={scss.statLabel}>Товаров</span>
             </div>
-            <div className={scss.statValue}>{stats.totalProducts}</div>
-            <div className={scss.statLabel}>Товаров в магазине</div>
-          </div>
-
-          <div className={scss.statCard}>
-            <div className={scss.statIcon}>
-              <Star size={24} />
+            <div className={scss.statDivider} />
+            <div className={scss.statItem}>
+              <span className={scss.statNum}>{stats.rating}</span>
+              <span className={scss.statLabel}>
+                {stats.reviewsCount} отзывов
+              </span>
             </div>
-            <div className={scss.statValue}>{stats.rating}</div>
-            <div className={scss.statLabel}>{stats.reviewsCount} отзывов</div>
           </div>
         </div>
 
-        {/* Быстрые действия */}
-        <section className={scss.quickActionsSection}>
-          <div className={scss.quickActions}>
-            <button className={scss.actionBtn}>
-              <span className={scss.actionIcon}>
-                <Plus size={20} />
-              </span>
-              Добавить товар
-            </button>
+        {/* Quick actions */}
+        <div className={scss.quickActions}>
+          <button className={`${scss.actionBtn} ${scss.primary}`}>
+            <Plus size={14} />
+            Добавить товар
+          </button>
+          <button className={scss.actionBtn}>
+            <CreditCard size={14} />
+            Заказы
+          </button>
+          <button className={scss.actionBtn}>
+            <Package size={14} />
+            Мои товары
+          </button>
+          <button className={scss.actionBtn}>
+            <Settings size={14} />
+            Настройки
+          </button>
+        </div>
 
-            <button className={scss.actionBtn}>
-              <span className={scss.actionIcon}>
-                <CreditCard size={20} />
-              </span>
-              Заказы
-            </button>
-
-            <button className={scss.actionBtn}>
-              <span className={scss.actionIcon}>
-                <Package size={20} />
-              </span>
-              Мои товары
-            </button>
-
-            <button className={scss.actionBtn}>
-              <span className={scss.actionIcon}>
-                <Settings size={20} />
-              </span>
-              Настройки
-            </button>
-          </div>
-        </section>
-
-        {/* MAIN GRID */}
+        {/* Main grid */}
         <div className={scss.mainGrid}>
-          {/* LEFT - Последние заказы */}
-          <div className={scss.leftColumn}>
-            <section className={scss.cardSection}>
+          {/* LEFT — последние заказы */}
+          <div>
+            <div className={scss.card}>
               <div className={scss.cardHeader}>
-                <h2>Последние заказы</h2>
-                <a href="#" className={scss.viewAll}>
+                <h2>
+                  <ShoppingBag size={14} />
+                  Последние заказы
+                </h2>
+                <a href="/orders" className={scss.viewAll}>
                   Все заказы →
                 </a>
               </div>
-
               <div className={scss.tableWrapper}>
                 <table className={scss.orderTable}>
                   <thead>
                     <tr>
-                      <th>ID Заказа</th>
+                      <th>Заказ</th>
                       <th>Клиент</th>
                       <th>Сумма</th>
                       <th>Статус</th>
@@ -139,22 +127,18 @@ const Home: FC = () => {
                   <tbody>
                     {recentOrders.map((order) => (
                       <tr key={order.id}>
-                        <td className={scss.orderId}>{order.id}</td>
-                        <td>{order.customer}</td>
-                        <td className={scss.amount}>
-                          {order.amount.toLocaleString()} с
+                        <td className={scss.orderId}>
+                          #{order.id.split("-")[1]}
                         </td>
+                        <td>{order.customer}</td>
+                        <td className={scss.amount}>{fmt(order.amount)}</td>
                         <td>
                           <span
                             className={`${scss.status} ${
                               scss[order.status.toLowerCase()]
                             }`}
                           >
-                            {order.status === "PENDING"
-                              ? "Ожидает"
-                              : order.status === "PAID"
-                                ? "Оплачен"
-                                : "Отправлен"}
+                            {STATUS_LABEL[order.status]}
                           </span>
                         </td>
                       </tr>
@@ -162,43 +146,37 @@ const Home: FC = () => {
                   </tbody>
                 </table>
               </div>
-            </section>
+            </div>
           </div>
 
-          {/* RIGHT - Товары на контроле */}
-          <div className={scss.rightColumn}>
-            <section className={scss.cardSection}>
+          {/* RIGHT — низкий остаток */}
+          <div>
+            <div className={scss.card}>
               <div className={scss.cardHeader}>
                 <h2>
-                  <AlertTriangle size={20} />
+                  <AlertTriangle size={14} />
                   Товары на контроле
                 </h2>
               </div>
-              <div className={scss.lowStockAlert}>
-                <p className={scss.alertText}>
-                  У вас есть товары с низким остатком. Пополните склад, чтобы не
-                  потерять продажи.
-                </p>
+              <div className={scss.alertBanner}>
+                <AlertTriangle size={14} />
+                Низкий остаток — пополните склад, чтобы не потерять продажи
               </div>
-              <div className={scss.lowStockList}>
-                {lowStockProducts.map((product, i) => (
-                  <div key={i} className={scss.lowStockItem}>
-                    <div className={scss.productInfo}>
-                      <div className={scss.productName}>{product.name}</div>
-                      <div className={scss.stockBadge}>
-                        <span
-                          className={`${scss.stockCount} ${
-                            product.stock <= 3 ? scss.critical : scss.warning
-                          }`}
-                        >
-                          Осталось: {product.stock} шт
-                        </span>
-                      </div>
-                    </div>
+              <div className={scss.stockList}>
+                {lowStockProducts.map((p, i) => (
+                  <div key={i} className={scss.stockRow}>
+                    <span className={scss.stockName}>{p.name}</span>
+                    <span
+                      className={`${scss.stockBadge} ${
+                        p.stock <= 3 ? scss.critical : scss.warning
+                      }`}
+                    >
+                      {p.stock} шт
+                    </span>
                   </div>
                 ))}
               </div>
-            </section>
+            </div>
           </div>
         </div>
       </div>

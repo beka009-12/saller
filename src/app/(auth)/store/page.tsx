@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { type FC } from "react";
 import AuthStote from "@/src/pages/auth/AuthStote";
 

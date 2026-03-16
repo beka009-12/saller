@@ -2,12 +2,10 @@ import { FC } from "react";
 import {
   CreditCard,
   ShoppingBag,
-  Star,
   Plus,
   Package,
   Settings,
   AlertTriangle,
-  Wallet,
 } from "lucide-react";
 import scss from "./Home.module.scss";
 
@@ -50,7 +48,6 @@ const Home: FC = () => {
   return (
     <main className={scss.dashboard}>
       <div className="container">
-
         {/* Header + stats */}
         <div className={scss.header}>
           <div className={scss.headerLeft}>
@@ -76,7 +73,9 @@ const Home: FC = () => {
             <div className={scss.statDivider} />
             <div className={scss.statItem}>
               <span className={scss.statNum}>{stats.rating}</span>
-              <span className={scss.statLabel}>{stats.reviewsCount} отзывов</span>
+              <span className={scss.statLabel}>
+                {stats.reviewsCount} отзывов
+              </span>
             </div>
           </div>
         </div>
@@ -103,7 +102,6 @@ const Home: FC = () => {
 
         {/* Main grid */}
         <div className={scss.mainGrid}>
-
           {/* LEFT — последние заказы */}
           <div>
             <div className={scss.card}>
@@ -129,7 +127,9 @@ const Home: FC = () => {
                   <tbody>
                     {recentOrders.map((order) => (
                       <tr key={order.id}>
-                        <td className={scss.orderId}>#{order.id.split("-")[1]}</td>
+                        <td className={scss.orderId}>
+                          #{order.id.split("-")[1]}
+                        </td>
                         <td>{order.customer}</td>
                         <td className={scss.amount}>{fmt(order.amount)}</td>
                         <td>
@@ -178,7 +178,6 @@ const Home: FC = () => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </main>

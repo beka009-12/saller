@@ -1,0 +1,51 @@
+.actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: #fff;
+    color: #555;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+
+    &:active { transform: scale(0.97); }
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+      padding: 7px 10px;
+    }
+  }
+
+  .editBtn {
+    &:hover {
+      background: #1a1a1a;
+      border-color: #1a1a1a;
+      color: #fff;
+    }
+  }
+
+  .deleteBtn {
+    &:hover {
+      background: #fb4a1e;
+      border-color: #fb4a1e;
+      color: #fff;
+    }
+  }
+}

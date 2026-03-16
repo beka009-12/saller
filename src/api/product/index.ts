@@ -13,3 +13,5 @@ const useCreateProduct = () => {
     },
   });
 };
+
+export { useCreateProduct };

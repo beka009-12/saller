@@ -34,6 +34,7 @@ const mockOrders: Order[] = [
     items: [
       { id: 1, productTitle: "Nike Air Force 1", quantity: 1, price: 8500 },
       { id: 2, productTitle: "Levi's 501 Jeans", quantity: 1, price: 5200 },
+      { id: 3, productTitle: "Levi's 501 Jeans", quantity: 1, price: 5200 },
     ],
   },
   {
@@ -119,9 +120,10 @@ const fmtDate = (iso: string) =>
     minute: "2-digit",
   });
 
+// Убрали PENDING из фильтров — "Новые" не нужны,
+// все заказы и так новые по сути
 const FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
   { label: "Все", value: "ALL" },
-  { label: "Новые", value: "PENDING" },
   { label: "Оплачены", value: "PAID" },
   { label: "Отправлены", value: "SHIPPED" },
   { label: "Завершены", value: "COMPLETED" },
@@ -135,6 +137,7 @@ const Order: FC = () => {
 
   const filtered =
     filter === "ALL" ? orders : orders.filter((o) => o.status === filter);
+
   const counts: Record<string, number> = { ALL: orders.length };
   orders.forEach((o) => {
     counts[o.status] = (counts[o.status] || 0) + 1;
@@ -147,9 +150,63 @@ const Order: FC = () => {
     );
   };
 
+  const toggleExpand = (id: number) => setExpanded(expanded === id ? null : id);
+
+  // Переиспользуемый блок детализации
+  const renderDetail = (order: Order) => (
+    <div className={scss.detail}>
+      <div className={scss.detailGrid}>
+        <div className={scss.detailBlock}>
+          <p className={scss.dlabel}>Доставить</p>
+          <p className={scss.dval}>{order.deliveryAddress}</p>
+          <p className={scss.dsub}>{order.deliveryName}</p>
+          <p className={scss.dsub}>{order.deliveryPhone}</p>
+        </div>
+
+        <div className={scss.detailBlock}>
+          <p className={scss.dlabel}>Состав</p>
+          <table className={scss.itemsTable}>
+            <tbody>
+              {order.items.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.productTitle}</td>
+                  <td className={scss.tdQty}>{item.quantity} шт.</td>
+                  <td className={scss.tdPrice}>
+                    {fmt(item.price * item.quantity)}
+                  </td>
+                </tr>
+              ))}
+              <tr className={scss.trTotal}>
+                <td colSpan={2}>Итого</td>
+                <td className={scss.tdPrice}>{fmt(order.total)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className={scss.detailBlock}>
+          <p className={scss.dlabel}>Действие</p>
+          <p className={scss.dsub}>Создан: {fmtDate(order.createdAt)}</p>
+          <p className={scss.dsub}>
+            Статус: <b>{STATUS_LABEL[order.status]}</b>
+          </p>
+          {STATUS_NEXT[order.status] && (
+            <button
+              className={scss.actionBtn}
+              onClick={(e) => advance(order.id, STATUS_NEXT[order.status]!, e)}
+            >
+              {STATUS_NEXT_LABEL[order.status]}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className={scss.Order}>
       <div className="container">
+        {/* Header */}
         <header className={scss.header}>
           <div className={scss.headerLeft}>
             <h1>Заказы</h1>
@@ -201,6 +258,7 @@ const Order: FC = () => {
           <div className={scss.empty}>Нет заказов</div>
         ) : (
           <div className={scss.table}>
+            {/* Заголовок таблицы (desktop) */}
             <div className={scss.tableHead}>
               <span>Заказ</span>
               <span>Покупатель</span>
@@ -213,19 +271,16 @@ const Order: FC = () => {
 
             {filtered.map((order) => (
               <div key={order.id} className={scss.rowWrap}>
+                {/* Desktop строка */}
                 <div
                   className={`${scss.row} ${expanded === order.id ? scss.rowOpen : ""}`}
-                  onClick={() =>
-                    setExpanded(expanded === order.id ? null : order.id)
-                  }
+                  onClick={() => toggleExpand(order.id)}
                 >
                   <span className={scss.orderId}>#{order.id}</span>
-
                   <span className={scss.buyer}>
                     <b>{order.deliveryName}</b>
                     <small>{order.deliveryPhone}</small>
                   </span>
-
                   <span className={scss.items}>
                     {order.items.map((item) => (
                       <span key={item.id} className={scss.itemChip}>
@@ -233,79 +288,54 @@ const Order: FC = () => {
                       </span>
                     ))}
                   </span>
-
                   <span className={scss.address}>{order.deliveryAddress}</span>
-
                   <span className={scss.total}>{fmt(order.total)}</span>
-
                   <span
                     className={`${scss.status} ${scss[`s_${order.status}`]}`}
                   >
                     {STATUS_LABEL[order.status]}
                   </span>
-
                   <span className={scss.chevron}>
                     {expanded === order.id ? "▲" : "▼"}
                   </span>
                 </div>
 
-                {expanded === order.id && (
-                  <div className={scss.detail}>
-                    <div className={scss.detailGrid}>
-                      <div className={scss.detailBlock}>
-                        <p className={scss.dlabel}>Доставить</p>
-                        <p className={scss.dval}>{order.deliveryAddress}</p>
-                        <p className={scss.dsub}>{order.deliveryName}</p>
-                        <p className={scss.dsub}>{order.deliveryPhone}</p>
-                      </div>
-
-                      <div className={scss.detailBlock}>
-                        <p className={scss.dlabel}>Состав</p>
-                        <table className={scss.itemsTable}>
-                          <tbody>
-                            {order.items.map((item) => (
-                              <tr key={item.id}>
-                                <td>{item.productTitle}</td>
-                                <td className={scss.tdQty}>
-                                  {item.quantity} шт.
-                                </td>
-                                <td className={scss.tdPrice}>
-                                  {fmt(item.price * item.quantity)}
-                                </td>
-                              </tr>
-                            ))}
-                            <tr className={scss.trTotal}>
-                              <td colSpan={2}>Итого</td>
-                              <td className={scss.tdPrice}>
-                                {fmt(order.total)}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <div className={scss.detailBlock}>
-                        <p className={scss.dlabel}>Действие</p>
-                        <p className={scss.dsub}>
-                          Создан: {fmtDate(order.createdAt)}
-                        </p>
-                        <p className={scss.dsub}>
-                          Статус: <b>{STATUS_LABEL[order.status]}</b>
-                        </p>
-                        {STATUS_NEXT[order.status] && (
-                          <button
-                            className={scss.actionBtn}
-                            onClick={(e) =>
-                              advance(order.id, STATUS_NEXT[order.status]!, e)
-                            }
-                          >
-                            {STATUS_NEXT_LABEL[order.status]}
-                          </button>
-                        )}
-                      </div>
+                {/* Mobile карточка */}
+                <div
+                  className={`${scss.mobileCard} ${expanded === order.id ? scss.mobileCardOpen : ""}`}
+                  onClick={() => toggleExpand(order.id)}
+                >
+                  <div className={scss.mobileCardTop}>
+                    <span className={scss.mobileCardId}>#{order.id}</span>
+                    <div className={scss.mobileCardBuyer}>
+                      <b>{order.deliveryName}</b>
+                      <small>{order.deliveryPhone}</small>
                     </div>
+                    <span
+                      className={`${scss.status} ${scss[`s_${order.status}`]}`}
+                    >
+                      {STATUS_LABEL[order.status]}
+                    </span>
                   </div>
-                )}
+                  <div className={scss.items}>
+                    {order.items.map((item) => (
+                      <span key={item.id} className={scss.itemChip}>
+                        {item.productTitle} <em>×{item.quantity}</em>
+                      </span>
+                    ))}
+                  </div>
+                  <div className={scss.mobileCardBottom}>
+                    <span className={scss.mobileCardTotal}>
+                      {fmt(order.total)}
+                    </span>
+                    <span className={scss.mobileCardChevron}>
+                      {expanded === order.id ? "▲" : "▼"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Detail (общий для desktop и mobile) */}
+                {expanded === order.id && renderDetail(order)}
               </div>
             ))}
           </div>

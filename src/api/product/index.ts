@@ -14,10 +14,10 @@ const useGetProducts = () => {
 };
 
 const useGetProductById = (id: number) => {
-  return useQuery<{ product: Product }>({
+  return useQuery<GetProductByIdResponse>({
     queryKey: ["products", id],
     queryFn: async () => {
-      const response = await api.get<{ product: Product }>(
+      const response = await api.get<GetProductByIdResponse>(
         `/commodity/product-for-user/${id}`,
       );
       return response.data;

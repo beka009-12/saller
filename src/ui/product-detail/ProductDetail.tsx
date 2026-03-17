@@ -14,16 +14,16 @@ interface ProductDetailProps {
 const ProductDetail = ({ id }: ProductDetailProps) => {
   const router = useRouter();
   const { data, isLoading } = useGetProductById(id);
-  
-  // Состояния
+
+  // Достаем product из даты (зависит от того, как возвращает ваш хук)
+  const product = data?.product;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  // Реф для отслеживания клика вне меню
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Логика закрытия меню при клике "мимо"
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -35,22 +35,31 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
   }, []);
 
   if (isLoading) return <div className={scss.loader}>Загрузка...</div>;
-  if (!data?.product) return <div className={scss.error}>Товар не найден</div>;
+  if (!product) return <div className={scss.error}>Товар не найден</div>;
 
-const discount = product.oldPrice
-    ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
-    : null;
+  // ЛОГИКА СКИДКИ:
+  // price — это старая/базовая цена
+  // newPrice — это текущая цена со скидкой
+  const hasDiscount = !!product.newPrice;
+  const actualPrice = hasDiscount
+    ? Number(product.newPrice)
+    : Number(product.price);
+  const oldPriceValue = hasDiscount ? Number(product.price) : null;
+
+  const discountPercent =
+    hasDiscount && oldPriceValue
+      ? Math.round(100 - (actualPrice / oldPriceValue) * 100)
+      : null;
 
   return (
     <section className={scss.ProductDetail}>
       <div className="container">
         <div className={scss.content}>
-          
           {/* Левая колонка: Галерея */}
           <div className={scss.gallery}>
-            {product.images.length > 1 && (
+            {product.images?.length > 1 && (
               <div className={scss.thumbs}>
-                {product.images.map((img, i) => (
+                {product.images.map((img: string, i: number) => (
                   <img
                     key={i}
                     src={img}
@@ -64,7 +73,7 @@ const discount = product.oldPrice
               </div>
             )}
             <img
-              src={product.images[selectedImageIndex] || "/placeholder.png"}
+              src={product.images?.[selectedImageIndex] || "/placeholder.png"}
               alt={product.title}
               className={scss.mainImage}
             />
@@ -75,22 +84,23 @@ const discount = product.oldPrice
             <div className={scss.badges}>
               <div className={scss.ded}>
                 <span className={scss.categoryBadge}>
-                  {product.category.name}
+                  {product.category?.name}
                 </span>
-                <span className={product.isActive ? scss.active : scss.inactive}>
+                <span
+                  className={product.isActive ? scss.active : scss.inactive}
+                >
                   {product.isActive ? "Активен" : "Неактивен"}
                 </span>
               </div>
 
-              {/* Бургер-меню (3 точки) */}
               <div className={scss.menuWrapper} ref={menuRef}>
-                <button 
+                <button
                   className={scss.burgerBtn}
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                   ⋮
                 </button>
-                
+
                 {isMenuOpen && (
                   <div className={scss.dropdownMenu}>
                     <button
@@ -102,7 +112,7 @@ const discount = product.oldPrice
                     >
                       <span>🖊</span> Изменить
                     </button>
-                    <button 
+                    <button
                       className={scss.menuItem}
                       onClick={() => router.back()}
                     >
@@ -118,23 +128,26 @@ const discount = product.oldPrice
               <p className={scss.description}>{product.description}</p>
             </div>
 
-<div className={scss.priceBox}>
+            <div className={scss.priceBox}>
               <div className={scss.priceMain}>
-                {/* Структура из блока errors */}
                 <span className={scss.label}>Цена</span>
                 <div className={scss.priceRow}>
+                  {/* Основная актуальная цена */}
                   <span className={scss.price}>
-                    {Number(product.price).toLocaleString()} <span>сом</span>
+                    {actualPrice.toLocaleString()} <span>сом</span>
                   </span>
-                  {product.oldPrice && (
+
+                  {/* Старая зачеркнутая цена, если есть скидка */}
+                  {hasDiscount && (
                     <span className={scss.oldPrice}>
-                      {Number(product.oldPrice).toLocaleString()} сом
+                      {oldPriceValue?.toLocaleString()} сом
                     </span>
                   )}
                 </div>
               </div>
-              {discount && discount > 0 && (
-                <span className={scss.discount}>−{Math.abs(discount)}%</span>
+              {/* Бейдж процента скидки */}
+              {discountPercent && discountPercent > 0 && (
+                <span className={scss.discount}>−{discountPercent}%</span>
               )}
             </div>
 
@@ -151,9 +164,9 @@ const discount = product.oldPrice
               )}
             </div>
 
-            {product.tags.length > 0 && (
+            {product.tags?.length > 0 && (
               <div className={scss.tags}>
-                {product.tags.map((tag, i) => (
+                {product.tags.map((tag: string, i: number) => (
                   <span key={i} className={scss.tag}>
                     #{tag}
                   </span>
@@ -163,14 +176,14 @@ const discount = product.oldPrice
 
             {product.archivedAt && (
               <div className={scss.archived}>
-                Архивировано: {new Date(product.archivedAt).toLocaleDateString("ru-RU")}
+                Архивировано:{" "}
+                {new Date(product.archivedAt).toLocaleDateString("ru-RU")}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Модальное окно */}
       {isModalOpen && (
         <UpdateModal productId={id} onClose={() => setIsModalOpen(false)} />
       )}

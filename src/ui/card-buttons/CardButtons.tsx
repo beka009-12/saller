@@ -17,9 +17,9 @@ const CardButtons: FC<CardButtonsProps> = ({ productId, onDelete }) => {
         <button className={scss.editBtn} onClick={() => setIsOpen(true)}>
           🖊 Изменить
         </button>
-        {/* <button className={scss.deleteBtn} onClick={() => onDelete(productId)}>
+        <button className={scss.deleteBtn} onClick={() => onDelete(productId)}>
           🗑 Удалить
-        </button> */}
+        </button>
       </div>
 
       {isOpen && (

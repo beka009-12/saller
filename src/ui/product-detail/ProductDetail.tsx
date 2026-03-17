@@ -26,24 +26,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
   return (
     <section className={scss.ProductDetail}>
       <div className="container">
-           <div className={scss.header}>
-          <div className={scss.headerActions}>
-            <button className={scss.editBtn} onClick={() => setIsOpen(true)}>
-              🖊 Изменить
-            </button>
-          </div>
-          <button className={scss.closeBtn} onClick={() => router.back()}>
-            ✕
-          </button>
-        </div>
-
         <div className={scss.content}>
           <div className={scss.gallery}>
-            <img
-              src={product.images[0]}
-              alt={product.title}
-              className={scss.mainImage}
-            />
             {product.images.length > 1 && (
               <div className={scss.thumbs}>
                 {product.images.map((img, i) => (
@@ -56,22 +40,44 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
                 ))}
               </div>
             )}
+            <img
+              src={product.images[0]}
+              alt={product.title}
+              className={scss.mainImage}
+            />
           </div>
 
           <div className={scss.info}>
             <div className={scss.badges}>
-              <span className={scss.categoryBadge}>
-                {product.category.name}
-              </span>
-              <span className={product.isActive ? scss.active : scss.inactive}>
-                {product.isActive ? "Активен" : "Неактивен"}
-              </span>
+              <div className={scss.ded}>
+                <span className={scss.categoryBadge}>
+                  {product.category.name}
+                </span>
+                <span
+                  className={product.isActive ? scss.active : scss.inactive}
+                >
+                  {product.isActive ? "Активен" : "Неактивен"}
+                </span>
+              </div>
+              <div className={scss.header}>
+                <div className={scss.headerActions}>
+                  <button
+                    className={scss.editBtn}
+                    onClick={() => setIsOpen(true)}
+                  >
+                    🖊 Изменить
+                  </button>
+                  <button
+                    className={scss.closeBtn}
+                    onClick={() => router.back()}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className={scss.titleBlock}>
-              {product.brandName && (
-                <p className={scss.brand}>{product.brandName}</p>
-              )}
               <h1 className={scss.title}>{product.title}</h1>
               <p className={scss.description}>{product.description}</p>
             </div>
@@ -114,28 +120,6 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
               </div>
             )}
 
-            {product.store && (
-              <div className={scss.store}>
-                {product.store.logo ? (
-                  <img
-                    src={product.store.logo}
-                    alt={product.store.name}
-                    className={scss.storeLogo}
-                  />
-                ) : (
-                  <div className={scss.storeInitials}>
-                    {product.store.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <div>
-                  <p className={scss.storeName}>{product.store.name}</p>
-                  {product.store.isVerified && (
-                    <p className={scss.verified}>✓ Проверен</p>
-                  )}
-                </div>
-              </div>
-            )}
-
             {product.archivedAt && (
               <span className={scss.archived}>
                 Архивировано:{" "}
@@ -145,7 +129,7 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
           </div>
         </div>
       </div>
-       {isOpen && (
+      {isOpen && (
         <UpdateModal productId={id} onClose={() => setIsOpen(false)} />
       )}
     </section>

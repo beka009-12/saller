@@ -43,7 +43,6 @@ const useDeleteProduct = () => {
 };
 
 export {
-  useCreateProduct,
   useGetProducts,
   useGetProductById,
   useUpdateProduct,

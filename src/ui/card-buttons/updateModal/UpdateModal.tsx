@@ -36,7 +36,7 @@ const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
           title: formData.get("title") as string,
           description: formData.get("description") as string,
           price: formData.get("price") as string,
-          oldPrice: (formData.get("oldPrice") as string) || null,
+          newPrice: (formData.get("newPrice") as string) || null,
           stockCount: Number(formData.get("stockCount")),
           brandName: (formData.get("brandName") as string) || null,
           tags: tagsValue ? tagsValue.split(",").map((t) => t.trim()) : [],
@@ -118,9 +118,9 @@ const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
             <div className={scss.field}>
               <label>Старая цена (сом)</label>
               <input
-                name="oldPrice"
+                name="newPrice"
                 type="number"
-                defaultValue={product.oldPrice ?? ""}
+                defaultValue={product.newPrice ?? ""}
                 placeholder="Старая цена"
               />
             </div>

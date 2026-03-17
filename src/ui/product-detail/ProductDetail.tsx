@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useRouter } from "next/navigation";
 import { useGetProductById } from "@/src/api/product";
@@ -19,8 +20,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 
   const product = data.product;
 
-  const discount = product.oldPrice
-    ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
+  const discount = product.newPrice
+    ? Math.round((1 - Number(product.price) / Number(product.newPrice)) * 100)
     : null;
 
   return (
@@ -88,8 +89,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
                 <span className={scss.price}>
                   {product.price} <span>сом</span>
                 </span>
-                {product.oldPrice && (
-                  <span className={scss.oldPrice}>{product.oldPrice} сом</span>
+                {product.newPrice && (
+                  <span className={scss.oldPrice}>{product.newPrice} сом</span>
                 )}
               </div>
               {discount && (

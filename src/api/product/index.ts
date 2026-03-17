@@ -5,7 +5,9 @@ const useGetProducts = () => {
   return useQuery<GetProductsResponse>({
     queryKey: ["products"],
     queryFn: async () => {
-      const response = await api.get<GetProductsResponse>("/commodity/products");
+      const response = await api.get<GetProductsResponse>(
+        "/commodity/products",
+      );
       return response.data;
     },
   });
@@ -16,7 +18,7 @@ const useGetProductById = (id: number) => {
     queryKey: ["products", id],
     queryFn: async () => {
       const response = await api.get<{ product: Product }>(
-        `/commodity/product-for-user/${id}`
+        `/commodity/product-for-user/${id}`,
       );
       return response.data;
     },
@@ -27,7 +29,13 @@ const useGetProductById = (id: number) => {
 const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<Product> }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<Product>;
+    }) => {
       const response = await api.patch(`/commodity/product-update/${id}`, data);
       return response.data;
     },
@@ -52,5 +60,3 @@ export {
   useUpdateProduct,
   useDeleteProduct,
 };
-
-

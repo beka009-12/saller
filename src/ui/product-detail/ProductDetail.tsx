@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -36,10 +37,7 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
   if (isLoading) return <div className={scss.loader}>Загрузка...</div>;
   if (!data?.product) return <div className={scss.error}>Товар не найден</div>;
 
-  const { product } = data;
-
-  // Расчет скидки
-  const discount = product.oldPrice
+const discount = product.oldPrice
     ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
     : null;
 
@@ -120,8 +118,9 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
               <p className={scss.description}>{product.description}</p>
             </div>
 
-            <div className={scss.priceBox}>
+<div className={scss.priceBox}>
               <div className={scss.priceMain}>
+                {/* Структура из блока errors */}
                 <span className={scss.label}>Цена</span>
                 <div className={scss.priceRow}>
                   <span className={scss.price}>

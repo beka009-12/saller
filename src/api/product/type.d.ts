@@ -20,7 +20,7 @@ interface Product {
   images: string[];
   brandName: string | null;
   price: string;
-  oldPrice: string | null;
+  newPrice: string | null;
   stockCount: number;
   tags: string[];
   isActive: boolean;
@@ -44,7 +44,7 @@ interface UpdateProductPayload {
   title?: string;
   description?: string;
   price?: string;
-  oldPrice?: string | null;
+  newPrice?: string | null;
   stockCount?: number;
   tags?: string[];
   categoryId?: number;
@@ -57,7 +57,7 @@ interface CreateProductPayload {
   title: string;
   description: string;
   price: number;
-  oldPrice?: number;
+  newPrice?: number;
   stockCount?: number;
   tags?: string[];
   images: File[];

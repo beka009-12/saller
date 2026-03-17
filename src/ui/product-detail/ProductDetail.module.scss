@@ -1,140 +1,90 @@
 .ProductDetail {
-  padding: 0 40px;
+  padding: 0;
   min-height: 100vh;
+  background-color: #fff;
 
   @media (max-width: 768px) {
-    padding: 0 15px;
-  }
-
-  .header {
-    display: flex;
-    gap: 10px;
-  }
-
-  .headerActions {
-    display: flex;
-    gap: 8px;
-  }
-
-  .editBtn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    background: #fff;
-    font-size: 13px;
-    font-weight: 500;
-    color: #555;
-    cursor: pointer;
-    transition:
-      background 0.2s,
-      border-color 0.2s,
-      color 0.2s,
-      transform 0.15s;
-
-    &:hover {
-      background: #1a1a1a;
-      border-color: #1a1a1a;
-      color: #fff;
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
-  }
-
-  .ded {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .closeBtn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: none;
-    background: white;
-    font-size: 16px;
-    cursor: pointer;
-    color: #888;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.25s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
-    &:hover {
-      background: #fb4a1e;
-      color: white;
-      transform: rotate(90deg);
-    }
+    padding: 20px 15px;
   }
 
   .content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
+    grid-template-columns: 1.2fr 1fr; // Галерея чуть шире инфо-блока
+    gap: 40px;
     align-items: start;
 
     @media (max-width: 900px) {
       grid-template-columns: 1fr;
+      gap: 24px;
     }
   }
 
+  // --- ГАЛЕРЕЯ ---
   .gallery {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     position: sticky;
-    top: 30px;
+    top: 20px;
 
     @media (max-width: 900px) {
       position: static;
     }
-  }
 
-  .mainImage {
-    width: 100%;
-    height: 460px;
-    object-fit: cover;
-    background: #eee;
-
-    @media (max-width: 768px) {
-      height: 320px;
+    @media (max-width: 480px) {
+      flex-direction: column-reverse; // Миниатюры под главным фото на мобилках
     }
   }
 
   .thumbs {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 10px;
+
+    @media (max-width: 480px) {
+      flex-direction: row;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
   }
 
   .thumb {
-    height: 85px;
-    width: 85px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: 0.2s;
-    background: #eee;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background: #f5f5f5;
 
     &:hover {
       border-color: #fb4a1e;
-      transform: scale(1.05);
+    }
+
+    &.activeThumb {
+      border-color: #fb4a1e;
+      transform: scale(1.02);
     }
   }
 
+  .mainImage {
+    flex: 1;
+    width: 100%;
+    max-height: 600px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f9f9f9;
+
+    @media (max-width: 768px) {
+      height: 350px;
+    }
+  }
+
+  // --- ИНФОРМАЦИЯ ---
   .info {
-    background: white;
     display: flex;
     flex-direction: column;
-    gap: 30px;
-
-    @media (max-width: 480px) {
-      padding: 20px;
-    }
+    gap: 24px;
   }
 
   .badges {
@@ -143,184 +93,270 @@
     align-items: center;
   }
 
-  .categoryBadge {
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #f1f1f1;
-    color: #555;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-  }
+  .ded {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-  .active {
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #e7f7ed;
-    color: #2e7d32;
-    font-weight: 600;
-  }
+    .categoryBadge {
+      font-size: 12px;
+      padding: 4px 12px;
+      background: #f1f1f1;
+      color: #666;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
 
-  .inactive {
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #fdecea;
-    color: #c62828;
-    font-weight: 600;
-  }
+    .active {
+      font-size: 12px;
+      color: #2e7d32;
+      background: #e8f5e9;
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
 
-  .brand {
-    font-size: 12px;
-    color: #aaa;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
-
-  .title {
-    font-size: 30px;
-    font-weight: 700;
-    color: #111;
-    margin-bottom: 10px;
-
-    @media (max-width: 480px) {
-      font-size: 24px;
+    .inactive {
+      font-size: 12px;
+      color: #757575;
+      background: #eeeeee;
+      padding: 4px 12px;
+      border-radius: 4px;
     }
   }
 
-  .description {
-    font-size: 14px;
-    color: #777;
-    line-height: 1.7;
-  }
-
-  .priceBox {
-    background: #f8f8f8;
-    border-radius: 18px;
-    padding: 20px;
+// --- БУРГЕР МЕНЮ ---
+  .menuWrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 15px;
+  }
+
+  .burgerBtn {
+    background: none; // Добавил легкий фон, как на скрине
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+    z-index: 101; // Кнопка выше меню
+
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+
+  .dropdownMenu {
+    position: absolute;
+    right: calc(100% + 10px); 
+    top: 50%;
+    transform: translateY(-50%); 
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    z-index: 100;
+    min-width: 120px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideInLeft 0.2s ease-out;
+  }
+
+  .menuItem {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #333;
+    transition: background 0.2s;
+
+    span {
+      font-size: 15px;
+      color: #888;
+      display: flex;
+      align-items: center;
+    }
+
+    &:hover {
+      background: #f9f9f9;
+      color: #fb4a1e;
+      
+      span { color: #fb4a1e; }
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #f8f8f8;
+    }
+  }
+}
+
+// Новая анимация появления слева
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+  // --- ТЕКСТОВЫЙ БЛОК ---
+  .titleBlock {
+    .title {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #1a1a1a;
+
+      @media (max-width: 480px) {
+        font-size: 24px;
+      }
+    }
+
+    .description {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #555;
+    }
+  }
+
+  // --- ЦЕНА ---
+  .priceBox {
+    background: #fcfcfc;
+    border: 1px solid #f0f0f0;
+    padding: 24px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .priceMain {
     display: flex;
     flex-direction: column;
-  }
+    gap: 4px;
 
-  .price {
-    font-size: 34px;
-    font-weight: 700;
-    color: #111;
+    .label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+    }
 
-    span {
+    .priceRow {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .price {
+      font-size: 36px;
+      font-weight: 800;
+      color: #000;
+
+      span {
+        font-size: 18px;
+        font-weight: 400;
+        margin-left: 4px;
+      }
+    }
+
+    .oldPrice {
+      text-decoration: line-through;
+      color: #bbb;
       font-size: 16px;
-      font-weight: 400;
-      color: #777;
     }
   }
 
-  .oldPrice {
-    font-size: 14px;
-    color: #bbb;
-    text-decoration: line-through;
-  }
-
   .discount {
-    margin-left: auto;
-    background: #fff0ed;
-    color: #fb4a1e;
+    background: #fb4a1e;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
     font-weight: 700;
-    font-size: 13px;
-    padding: 8px 12px;
-    border-radius: 10px;
+    font-size: 14px;
   }
 
+  // --- ХАРАКТЕРИСТИКИ ---
   .stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 16px;
   }
 
   .statItem {
+    padding: 16px;
     background: #f8f8f8;
-    border-radius: 14px;
-    padding: 14px 16px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
+    gap: 4px;
 
     span:first-child {
       font-size: 11px;
-      color: #999;
+      color: #888;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     span:last-child {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 700;
-      color: #111;
+      color: #222;
     }
   }
 
+  // --- ТЕГИ ---
   .tags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-  }
 
-  .tag {
-    font-size: 12px;
-    padding: 6px 12px;
-    border-radius: 10px;
-    background: #f3f3f3;
-    color: #555;
-  }
+    .tag {
+      background: #f0f0f0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #555;
+      transition: 0.2s;
 
-  .store {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #f8f8f8;
-    border-radius: 14px;
-    padding: 14px;
-  }
-
-  .storeLogo {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    object-fit: cover;
-  }
-
-  .storeInitials {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: #111;
-    color: white;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .storeName {
-    font-size: 15px;
-    font-weight: 600;
-    color: #111;
-  }
-
-  .verified {
-    font-size: 12px;
-    color: #2e7d32;
+      &:hover {
+        background: #e0e0e0;
+      }
+    }
   }
 
   .archived {
+    padding: 12px;
+    background: #fff4e5;
+    color: #663c00;
+    border-radius: 6px;
     font-size: 13px;
-    color: #e67e22;
+    text-align: center;
+  }
+
+
+// Анимация для выпадающего меню
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

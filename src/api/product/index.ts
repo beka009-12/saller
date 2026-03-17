@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "..";
 
 const useGetProducts = () => {
@@ -13,7 +13,7 @@ const useGetProducts = () => {
 
 const useGetProductById = (id: number) => {
   return useQuery<{ product: Product }>({
-    queryKey: ["product", id],
+    queryKey: ["products", id],
     queryFn: async () => {
       const response = await api.get<{ product: Product }>(
         `/commodity/product-for-user/${id}`
@@ -25,10 +25,14 @@ const useGetProductById = (id: number) => {
 };
 
 const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<Product> }) => {
       const response = await api.patch(`/commodity/product-update/${id}`, data);
       return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 };

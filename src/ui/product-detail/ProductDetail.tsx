@@ -1,8 +1,9 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useGetProductById } from "@/src/api/product";
 import scss from "./ProductDetail.module.scss";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import UpdateModal from "../card-buttons/updateModal/UpdateModal";
 
 interface ProductDetailProps {
@@ -12,13 +13,32 @@ interface ProductDetailProps {
 const ProductDetail = ({ id }: ProductDetailProps) => {
   const router = useRouter();
   const { data, isLoading } = useGetProductById(id);
-  const [isOpen, setIsOpen] = useState(false);
+  
+  // Состояния
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  if (isLoading) return <p>Загрузка...</p>;
-  if (!data) return <p>Товар не найден</p>;
+  // Реф для отслеживания клика вне меню
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const product = data.product;
+  // Логика закрытия меню при клике "мимо"
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
+  if (isLoading) return <div className={scss.loader}>Загрузка...</div>;
+  if (!data?.product) return <div className={scss.error}>Товар не найден</div>;
+
+  const { product } = data;
+
+  // Расчет скидки
   const discount = product.oldPrice
     ? Math.round((1 - Number(product.price) / Number(product.oldPrice)) * 100)
     : null;
@@ -27,6 +47,8 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
     <section className={scss.ProductDetail}>
       <div className="container">
         <div className={scss.content}>
+          
+          {/* Левая колонка: Галерея */}
           <div className={scss.gallery}>
             {product.images.length > 1 && (
               <div className={scss.thumbs}>
@@ -34,46 +56,62 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
                   <img
                     key={i}
                     src={img}
-                    alt={`${i + 1}`}
-                    className={scss.thumb}
+                    alt={`Preview ${i}`}
+                    className={`${scss.thumb} ${
+                      selectedImageIndex === i ? scss.activeThumb : ""
+                    }`}
+                    onClick={() => setSelectedImageIndex(i)}
                   />
                 ))}
               </div>
             )}
             <img
-              src={product.images[0]}
+              src={product.images[selectedImageIndex] || "/placeholder.png"}
               alt={product.title}
               className={scss.mainImage}
             />
           </div>
 
+          {/* Правая колонка: Инфо */}
           <div className={scss.info}>
             <div className={scss.badges}>
               <div className={scss.ded}>
                 <span className={scss.categoryBadge}>
                   {product.category.name}
                 </span>
-                <span
-                  className={product.isActive ? scss.active : scss.inactive}
-                >
+                <span className={product.isActive ? scss.active : scss.inactive}>
                   {product.isActive ? "Активен" : "Неактивен"}
                 </span>
               </div>
-              <div className={scss.header}>
-                <div className={scss.headerActions}>
-                  <button
-                    className={scss.editBtn}
-                    onClick={() => setIsOpen(true)}
-                  >
-                    🖊 Изменить
-                  </button>
-                  <button
-                    className={scss.closeBtn}
-                    onClick={() => router.back()}
-                  >
-                    ✕
-                  </button>
-                </div>
+
+              {/* Бургер-меню (3 точки) */}
+              <div className={scss.menuWrapper} ref={menuRef}>
+                <button 
+                  className={scss.burgerBtn}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  ⋮
+                </button>
+                
+                {isMenuOpen && (
+                  <div className={scss.dropdownMenu}>
+                    <button
+                      className={scss.menuItem}
+                      onClick={() => {
+                        setIsModalOpen(true);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <span>🖊</span> Изменить
+                    </button>
+                    <button 
+                      className={scss.menuItem}
+                      onClick={() => router.back()}
+                    >
+                      <span>✕</span> Назад
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -84,15 +122,19 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
 
             <div className={scss.priceBox}>
               <div className={scss.priceMain}>
-                <span>Цена</span>
-                <span className={scss.price}>
-                  {product.price} <span>сом</span>
-                </span>
-                {product.oldPrice && (
-                  <span className={scss.oldPrice}>{product.oldPrice} сом</span>
-                )}
+                <span className={scss.label}>Цена</span>
+                <div className={scss.priceRow}>
+                  <span className={scss.price}>
+                    {Number(product.price).toLocaleString()} <span>сом</span>
+                  </span>
+                  {product.oldPrice && (
+                    <span className={scss.oldPrice}>
+                      {Number(product.oldPrice).toLocaleString()} сом
+                    </span>
+                  )}
+                </div>
               </div>
-              {discount && (
+              {discount && discount > 0 && (
                 <span className={scss.discount}>−{Math.abs(discount)}%</span>
               )}
             </div>
@@ -121,16 +163,17 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
             )}
 
             {product.archivedAt && (
-              <span className={scss.archived}>
-                Архивировано:{" "}
-                {new Date(product.archivedAt).toLocaleDateString("ru-RU")}
-              </span>
+              <div className={scss.archived}>
+                Архивировано: {new Date(product.archivedAt).toLocaleDateString("ru-RU")}
+              </div>
             )}
           </div>
         </div>
       </div>
-      {isOpen && (
-        <UpdateModal productId={id} onClose={() => setIsOpen(false)} />
+
+      {/* Модальное окно */}
+      {isModalOpen && (
+        <UpdateModal productId={id} onClose={() => setIsModalOpen(false)} />
       )}
     </section>
   );

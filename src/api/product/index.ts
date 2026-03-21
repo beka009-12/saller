@@ -1,6 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "..";
 
+const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation<CreateProductRes, unknown, FormData>({
+    mutationFn: async (formData: FormData) => {
+      const response = await api.post("/commodity/create-product", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
 const useGetProducts = () => {
   return useQuery<GetProductsResponse>({
     queryKey: ["products"],
@@ -59,4 +74,5 @@ export {
   useGetProductById,
   useUpdateProduct,
   useDeleteProduct,
+  useCreateProduct,
 };

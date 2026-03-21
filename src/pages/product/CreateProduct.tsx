@@ -1,11 +1,455 @@
-import { type FC } from "react";
+"use client";
+import { type FC, useState, useRef, useCallback, useEffect } from "react";
 import scss from "./CreateProduct.module.scss";
+import { useGetCategories } from "@/src/api/category";
+import { useCreateProduct } from "@/src/api/product";
 
+interface CategoryWithChildren {
+  id: number;
+  name: string;
+  children?: CategoryWithChildren[];
+}
+
+interface FormState {
+  images: File[];
+  title: string;
+  description: string;
+  tags: string[];
+  price: string;
+  newPrice: string;
+  stockCount: string;
+  categoryId: number | null;
+  brandName: string;
+}
+
+const TOTAL_STEPS = 4;
+
+// ─── Step 1: Photos ───────────────────────────────────────────────────────────
+const Step1Photos: FC<{ images: File[]; onChange: (imgs: File[]) => void }> = ({
+  images,
+  onChange,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const [previews, setPreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    const urls = images.map((file) => URL.createObjectURL(file));
+    setPreviews(urls);
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, [images]);
+
+  const addFiles = (files: FileList | null) => {
+    if (!files) return;
+    const next = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    onChange([...images, ...next].slice(0, 10));
+  };
+
+  return (
+    <div className={scss.step}>
+      <h2 className={scss.stepTitle}>Фотографии товара</h2>
+      <p className={scss.stepDesc}>
+        Добавьте до 10 фото. Первое фото — главное.
+      </p>
+
+      <div
+        className={`${scss.dropzone} ${dragging ? scss.dragging : ""}`}
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          addFiles(e.dataTransfer.files);
+        }}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          hidden
+          onChange={(e) => addFiles(e.target.files)}
+        />
+        <div className={scss.dropzoneInner}>
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>Перетащите фото или нажмите для выбора</span>
+        </div>
+      </div>
+
+      {previews.length > 0 && (
+        <div className={scss.imageGrid}>
+          {previews.map((url, i) => (
+            <div
+              key={url}
+              className={`${scss.imageCard} ${i === 0 ? scss.mainImage : ""}`}
+            >
+              <img src={url} alt="" />
+              {i === 0 && <span className={scss.mainBadge}>Главное</span>}
+              <button
+                className={scss.removeBtn}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(images.filter((_, j) => j !== i));
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Step 2: Info ─────────────────────────────────────────────────────────────
+const Step2Info: FC<{
+  data: FormState;
+  onChange: (key: keyof FormState, value: unknown) => void;
+}> = ({ data, onChange }) => {
+  const [tagInput, setTagInput] = useState("");
+
+  const addTag = () => {
+    const tag = tagInput.trim();
+    if (tag && !data.tags.includes(tag)) onChange("tags", [...data.tags, tag]);
+    setTagInput("");
+  };
+
+  const priceError =
+    data.newPrice && data.price && Number(data.newPrice) >= Number(data.price)
+      ? "Цена со скидкой должна быть меньше основной"
+      : null;
+
+  return (
+    <div className={scss.step}>
+      <h2 className={scss.stepTitle}>Информация о товаре</h2>
+
+      <div className={scss.field}>
+        <label>Название *</label>
+        <input
+          type="text"
+          placeholder="Введите название товара"
+          value={data.title}
+          onChange={(e) => onChange("title", e.target.value)}
+        />
+      </div>
+
+      <div className={scss.field}>
+        <label>Описание *</label>
+        <textarea
+          placeholder="Подробное описание товара"
+          value={data.description}
+          rows={4}
+          onChange={(e) => onChange("description", e.target.value)}
+        />
+      </div>
+
+      <div className={scss.fieldRow}>
+        <div className={scss.field}>
+          <label>Цена (сом) *</label>
+          <input
+            type="number"
+            placeholder="0"
+            value={data.price}
+            onChange={(e) => onChange("price", e.target.value)}
+          />
+        </div>
+        <div className={scss.field}>
+          <label>Цена со скидкой</label>
+          <input
+            type="number"
+            placeholder="0"
+            value={data.newPrice}
+            className={priceError ? scss.inputError : ""}
+            onChange={(e) => onChange("newPrice", e.target.value)}
+          />
+          {priceError && <span className={scss.errorMsg}>{priceError}</span>}
+        </div>
+        <div className={scss.field}>
+          <label>Количество</label>
+          <input
+            type="number"
+            placeholder="0"
+            value={data.stockCount}
+            onChange={(e) => onChange("stockCount", e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={scss.field}>
+        <label>Теги</label>
+        <div className={scss.tagInput}>
+          <input
+            type="text"
+            placeholder="Введите тег и нажмите Enter"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && (e.preventDefault(), addTag())
+            }
+          />
+          <button type="button" onClick={addTag}>
+            +
+          </button>
+        </div>
+        <div className={scss.tags}>
+          {data.tags.map((tag) => (
+            <span key={tag} className={scss.tag}>
+              {tag}
+              <button
+                type="button"
+                onClick={() =>
+                  onChange(
+                    "tags",
+                    data.tags.filter((t) => t !== tag),
+                  )
+                }
+              >
+                ✕
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Step 3: Category ─────────────────────────────────────────────────────────
+const Step3Category: FC<{
+  categoryId: number | null;
+  onChange: (id: number) => void;
+  categories: CategoryWithChildren[];
+  isLoading: boolean;
+}> = ({ categoryId, onChange, categories, isLoading }) => {
+  const [path, setPath] = useState<number[]>([]);
+
+  const getLevelItems = (level: number) => {
+    if (level === 0) return categories;
+    let list = categories;
+    for (let i = 0; i < level; i++) {
+      const found = list.find((c) => c.id === path[i]);
+      if (!found || !found.children) return [];
+      list = found.children;
+    }
+    return list;
+  };
+
+  if (isLoading)
+    return <div className={scss.loading}>Загрузка категорий...</div>;
+
+  const labels = ["Раздел", "Категория", "Подкатегория", "Тип"];
+
+  return (
+    <div className={scss.step}>
+      <h2 className={scss.stepTitle}>Категория товара</h2>
+      <p className={scss.stepDesc}>
+        Выбирайте последовательно: раздел → категория.
+      </p>
+
+      <div className={scss.categoryLevels}>
+        {Array.from({ length: path.length + 1 }).map((_, level) => {
+          const items = getLevelItems(level);
+          if (items.length === 0) return null;
+          return (
+            <div key={level} className={scss.categoryLevel}>
+              <span className={scss.levelLabel}>
+                {labels[level] || `Уровень ${level + 1}`}
+              </span>
+              <div className={scss.categoryList}>
+                {items.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    className={`${scss.categoryBtn} ${path[level] === cat.id ? scss.active : ""}`}
+                    onClick={() => {
+                      setPath([...path.slice(0, level), cat.id]);
+                      onChange(cat.id);
+                    }}
+                  >
+                    <span>{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {categoryId && (
+        <div className={scss.selectedCategory}>✓ Категория выбрана</div>
+      )}
+    </div>
+  );
+};
+
+// ─── Step 4: Brand ────────────────────────────────────────────────────────────
+const Step4Brand: FC<{ brandName: string; onChange: (v: string) => void }> = ({
+  brandName,
+  onChange,
+}) => (
+  <div className={scss.step}>
+    <h2 className={scss.stepTitle}>Бренд</h2>
+    <p className={scss.stepDesc}>Укажите название бренда, если есть.</p>
+    <div className={scss.field}>
+      <label>Название бренда</label>
+      <input
+        type="text"
+        placeholder="Например: Nike, Adidas..."
+        value={brandName}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+    <div className={scss.brandPreview}>
+      {brandName ? (
+        <div className={scss.brandBadge}>{brandName}</div>
+      ) : (
+        <span className={scss.noBrand}>Без бренда</span>
+      )}
+    </div>
+  </div>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 const CreateProduct: FC = () => {
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState<FormState>({
+    images: [],
+    title: "",
+    description: "",
+    tags: [],
+    price: "",
+    newPrice: "",
+    stockCount: "",
+    categoryId: null,
+    brandName: "",
+  });
+
+  const { data: categories, isLoading: isLoadingCats } = useGetCategories();
+  const { mutate: createProduct, isPending } = useCreateProduct();
+
+  const update = (key: keyof FormState, value: unknown) =>
+    setForm((p) => ({ ...p, [key]: value }));
+
+  const canNext = () => {
+    if (step === 1) return form.images.length > 0;
+    if (step === 2)
+      return (
+        !!form.title &&
+        !!form.description &&
+        !!form.price &&
+        (!form.newPrice || Number(form.newPrice) < Number(form.price))
+      );
+    if (step === 3) return !!form.categoryId;
+    return true;
+  };
+
+  const handleSubmit = () => {
+    const formData = new FormData();
+    formData.append("categoryId", String(form.categoryId));
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("price", form.price);
+    if (form.brandName) formData.append("brandName", form.brandName);
+    if (form.newPrice) formData.append("newPrice", form.newPrice);
+    if (form.stockCount) formData.append("stockCount", form.stockCount);
+    if (form.tags.length) formData.append("tags", JSON.stringify(form.tags));
+    form.images.forEach((img) => formData.append("images", img));
+
+    createProduct(formData);
+  };
+
+  const stepLabels = ["Фото", "Инфо", "Категория", "Бренд"];
+
   return (
     <section className={scss.CreateProduct}>
       <div className="container">
-        <div className={scss.content}>CreateProduct</div>
+        <div className={scss.content}>
+          {/* Progress bar */}
+          <div className={scss.progress}>
+            {stepLabels.map((label, i) => (
+              <div
+                key={i}
+                className={`${scss.progressItem} ${step > i + 1 ? scss.done : ""} ${step === i + 1 ? scss.active : ""}`}
+              >
+                <div className={scss.progressCircle}>
+                  {step > i + 1 ? "✓" : i + 1}
+                </div>
+                <span>{label}</span>
+                {i < TOTAL_STEPS - 1 && <div className={scss.progressLine} />}
+              </div>
+            ))}
+          </div>
+
+          <div className={scss.stepWrapper}>
+            {step === 1 && (
+              <Step1Photos
+                images={form.images}
+                onChange={(v) => update("images", v)}
+              />
+            )}
+            {step === 2 && <Step2Info data={form} onChange={update} />}
+            {step === 3 && (
+              <Step3Category
+                categoryId={form.categoryId}
+                onChange={(id) => update("categoryId", id)}
+                categories={
+                  (categories as unknown as CategoryWithChildren[]) || []
+                }
+                isLoading={isLoadingCats}
+              />
+            )}
+            {step === 4 && (
+              <Step4Brand
+                brandName={form.brandName}
+                onChange={(v) => update("brandName", v)}
+              />
+            )}
+          </div>
+
+          <div className={scss.nav}>
+            {step > 1 && (
+              <button
+                className={scss.btnBack}
+                onClick={() => setStep((s) => s - 1)}
+              >
+                Назад
+              </button>
+            )}
+            {step < TOTAL_STEPS ? (
+              <button
+                className={scss.btnNext}
+                disabled={!canNext()}
+                onClick={() => setStep((s) => s + 1)}
+              >
+                Далее
+              </button>
+            ) : (
+              <button
+                className={scss.btnSubmit}
+                disabled={isPending}
+                onClick={handleSubmit}
+              >
+                {isPending ? "Создание..." : "Создать товар"}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

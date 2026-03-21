@@ -51,7 +51,7 @@ interface UpdateProductPayload {
   brandName?: string | null;
 }
 
-interface CreateProductPayload {
+interface CreateProductReq {
   categoryId: number;
   brandName?: string;
   title: string;
@@ -61,6 +61,11 @@ interface CreateProductPayload {
   stockCount?: number;
   tags?: string[];
   images: File[];
+}
+
+interface CreateProductRes {
+  message: string;
+  product: Product;
 }
 
 interface DeleteProductResponse {

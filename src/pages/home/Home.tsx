@@ -1,3 +1,4 @@
+"use client";
 import { FC } from "react";
 import {
   CreditCard,
@@ -8,6 +9,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import scss from "./Home.module.scss";
+import { useRouter } from "next/navigation";
 
 const stats = {
   todayOrders: 12,
@@ -45,6 +47,8 @@ const fmt = (n: number) =>
   }).format(n);
 
 const Home: FC = () => {
+  const router = useRouter();
+
   return (
     <main className={scss.dashboard}>
       <div className="container">
@@ -82,19 +86,31 @@ const Home: FC = () => {
 
         {/* Quick actions */}
         <div className={scss.quickActions}>
-          <button className={`${scss.actionBtn} ${scss.primary}`}>
+          <button
+            onClick={() => router.push("/products/new")}
+            className={`${scss.actionBtn} ${scss.primary}`}
+          >
             <Plus size={14} />
             Добавить товар
           </button>
-          <button className={scss.actionBtn}>
+          <button
+            onClick={() => router.push("/orders")}
+            className={scss.actionBtn}
+          >
             <CreditCard size={14} />
             Заказы
           </button>
-          <button className={scss.actionBtn}>
+          <button
+            onClick={() => router.push("/products")}
+            className={scss.actionBtn}
+          >
             <Package size={14} />
             Мои товары
           </button>
-          <button className={scss.actionBtn}>
+          <button
+            onClick={() => router.push("/settings")}
+            className={scss.actionBtn}
+          >
             <Settings size={14} />
             Настройки
           </button>

@@ -3,6 +3,7 @@ import { type FC, useState, useRef, useCallback, useEffect } from "react";
 import scss from "./CreateProduct.module.scss";
 import { useGetCategories } from "@/src/api/category";
 import { useCreateProduct } from "@/src/api/product";
+import toast from "react-hot-toast";
 
 interface CategoryWithChildren {
   id: number;
@@ -360,18 +361,23 @@ const CreateProduct: FC = () => {
   };
 
   const handleSubmit = () => {
-    const formData = new FormData();
-    formData.append("categoryId", String(form.categoryId));
-    formData.append("title", form.title);
-    formData.append("description", form.description);
-    formData.append("price", form.price);
-    if (form.brandName) formData.append("brandName", form.brandName);
-    if (form.newPrice) formData.append("newPrice", form.newPrice);
-    if (form.stockCount) formData.append("stockCount", form.stockCount);
-    if (form.tags.length) formData.append("tags", JSON.stringify(form.tags));
-    form.images.forEach((img) => formData.append("images", img));
+    try {
+      const formData = new FormData();
+      formData.append("categoryId", String(form.categoryId));
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("price", form.price);
+      if (form.brandName) formData.append("brandName", form.brandName);
+      if (form.newPrice) formData.append("newPrice", form.newPrice);
+      if (form.stockCount) formData.append("stockCount", form.stockCount);
+      if (form.tags.length) formData.append("tags", JSON.stringify(form.tags));
+      form.images.forEach((img) => formData.append("images", img));
 
-    createProduct(formData);
+      createProduct(formData);
+      toast.success("Товар успешно создан!");
+    } catch (error) {
+      toast.error("Ошибка при создании товара. Попробуйте снова.");
+    }
   };
 
   const stepLabels = ["Фото", "Инфо", "Категория", "Бренд"];

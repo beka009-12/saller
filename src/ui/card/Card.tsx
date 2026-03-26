@@ -13,7 +13,7 @@ const Card: FC<CardProps> = ({ product }) => {
   const { mutate: deleteProduct } = useDeleteProduct();
 
   const handleDelete = (id: number) => {
-    if (confirm("Удалить товар?")) {
+    if (confirm("Удалить товар")) {
       deleteProduct(id);
     }
   };

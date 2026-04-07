@@ -1,5 +1,5 @@
 "use client";
-import { type FC, useState, useRef, useCallback, useEffect } from "react";
+import { type FC, useState, useRef, useEffect, useMemo } from "react";
 import scss from "./CreateProduct.module.scss";
 import { useGetCategories } from "@/src/api/category";
 import { useCreateProduct } from "@/src/api/product";
@@ -32,13 +32,14 @@ const Step1Photos: FC<{ images: File[]; onChange: (imgs: File[]) => void }> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const [previews, setPreviews] = useState<string[]>([]);
+
+  const previews = useMemo(() => {
+    return images.map((file) => URL.createObjectURL(file));
+  }, [images]);
 
   useEffect(() => {
-    const urls = images.map((file) => URL.createObjectURL(file));
-    setPreviews(urls);
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [images]);
+    return () => previews.forEach((url) => URL.revokeObjectURL(url));
+  }, [previews]);
 
   const addFiles = (files: FileList | null) => {
     if (!files) return;
@@ -386,7 +387,6 @@ const CreateProduct: FC = () => {
     <section className={scss.CreateProduct}>
       <div className="container">
         <div className={scss.content}>
-          {/* Progress bar */}
           <div className={scss.progress}>
             {stepLabels.map((label, i) => (
               <div

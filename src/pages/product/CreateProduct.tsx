@@ -5,6 +5,9 @@ import { useGetCategories } from "@/src/api/category";
 import { useCreateProduct } from "@/src/api/product";
 import toast from "react-hot-toast";
 
+type Gender = "MALE" | "FEMALE" | "UNISEX";
+type Season = "SPRING_SUMMER" | "AUTUMN_WINTER" | "ALL_SEASON";
+
 interface CategoryWithChildren {
   id: number;
   name: string;
@@ -15,15 +18,20 @@ interface FormState {
   images: File[];
   title: string;
   description: string;
-  tags: string[];
   price: string;
   newPrice: string;
   stockCount: string;
   categoryId: number | null;
   brandName: string;
+  sizes: string[];
+  colors: string[];
+  material?: string;
+  gender: Gender | "";
+  season: Season | "";
+  isActive: boolean;
 }
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 // ─── Step 1: Photos ───────────────────────────────────────────────────────────
 const Step1Photos: FC<{ images: File[]; onChange: (imgs: File[]) => void }> = ({
@@ -33,9 +41,10 @@ const Step1Photos: FC<{ images: File[]; onChange: (imgs: File[]) => void }> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
-  const previews = useMemo(() => {
-    return images.map((file) => URL.createObjectURL(file));
-  }, [images]);
+  const previews = useMemo(
+    () => images.map((file) => URL.createObjectURL(file)),
+    [images],
+  );
 
   useEffect(() => {
     return () => previews.forEach((url) => URL.revokeObjectURL(url));
@@ -43,8 +52,10 @@ const Step1Photos: FC<{ images: File[]; onChange: (imgs: File[]) => void }> = ({
 
   const addFiles = (files: FileList | null) => {
     if (!files) return;
-    const next = Array.from(files).filter((f) => f.type.startsWith("image/"));
-    onChange([...images, ...next].slice(0, 10));
+    const validFiles = Array.from(files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    onChange([...images, ...validFiles].slice(0, 10));
   };
 
   return (
@@ -105,10 +116,7 @@ const Step1Photos: FC<{ images: File[]; onChange: (imgs: File[]) => void }> = ({
               <button
                 className={scss.removeBtn}
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onChange(images.filter((_, j) => j !== i));
-                }}
+                onClick={() => onChange(images.filter((_, j) => j !== i))}
               >
                 ✕
               </button>
@@ -125,14 +133,6 @@ const Step2Info: FC<{
   data: FormState;
   onChange: (key: keyof FormState, value: unknown) => void;
 }> = ({ data, onChange }) => {
-  const [tagInput, setTagInput] = useState("");
-
-  const addTag = () => {
-    const tag = tagInput.trim();
-    if (tag && !data.tags.includes(tag)) onChange("tags", [...data.tags, tag]);
-    setTagInput("");
-  };
-
   const priceError =
     data.newPrice && data.price && Number(data.newPrice) >= Number(data.price)
       ? "Цена со скидкой должна быть меньше основной"
@@ -143,21 +143,21 @@ const Step2Info: FC<{
       <h2 className={scss.stepTitle}>Информация о товаре</h2>
 
       <div className={scss.field}>
-        <label>Название *</label>
+        <label>Название товара *</label>
         <input
           type="text"
-          placeholder="Введите название товара"
+          placeholder="Например: Мужские кроссовки Nike Air Max Plus"
           value={data.title}
           onChange={(e) => onChange("title", e.target.value)}
         />
       </div>
 
       <div className={scss.field}>
-        <label>Описание *</label>
+        <label>Описание товара *</label>
         <textarea
-          placeholder="Подробное описание товара"
+          placeholder="Подробное описание..."
           value={data.description}
-          rows={4}
+          rows={5}
           onChange={(e) => onChange("description", e.target.value)}
         />
       </div>
@@ -167,7 +167,7 @@ const Step2Info: FC<{
           <label>Цена (сом) *</label>
           <input
             type="number"
-            placeholder="0"
+            placeholder="19650"
             value={data.price}
             onChange={(e) => onChange("price", e.target.value)}
           />
@@ -176,7 +176,7 @@ const Step2Info: FC<{
           <label>Цена со скидкой</label>
           <input
             type="number"
-            placeholder="0"
+            placeholder="15699"
             value={data.newPrice}
             className={priceError ? scss.inputError : ""}
             onChange={(e) => onChange("newPrice", e.target.value)}
@@ -184,10 +184,10 @@ const Step2Info: FC<{
           {priceError && <span className={scss.errorMsg}>{priceError}</span>}
         </div>
         <div className={scss.field}>
-          <label>Количество</label>
+          <label>Остаток на складе</label>
           <input
             type="number"
-            placeholder="0"
+            placeholder="20"
             value={data.stockCount}
             onChange={(e) => onChange("stockCount", e.target.value)}
           />
@@ -195,46 +195,124 @@ const Step2Info: FC<{
       </div>
 
       <div className={scss.field}>
-        <label>Теги</label>
-        <div className={scss.tagInput}>
+        <label className={scss.checkboxLabel}>
           <input
-            type="text"
-            placeholder="Введите тег и нажмите Enter"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" && (e.preventDefault(), addTag())
-            }
+            type="checkbox"
+            checked={data.isActive}
+            onChange={(e) => onChange("isActive", e.target.checked)}
           />
-          <button type="button" onClick={addTag}>
-            +
-          </button>
-        </div>
-        <div className={scss.tags}>
-          {data.tags.map((tag) => (
-            <span key={tag} className={scss.tag}>
-              {tag}
-              <button
-                type="button"
-                onClick={() =>
-                  onChange(
-                    "tags",
-                    data.tags.filter((t) => t !== tag),
-                  )
-                }
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-        </div>
+          Опубликовать товар сразу (активен)
+        </label>
       </div>
     </div>
   );
 };
 
-// ─── Step 3: Category ─────────────────────────────────────────────────────────
-const Step3Category: FC<{
+// ─── Step 3: Attributes ───────────────────────────────────────────────────────
+const Step3Attributes: FC<{
+  data: FormState;
+  onChange: (key: keyof FormState, value: unknown) => void;
+}> = ({ data, onChange }) => {
+  const GENDER_OPTIONS: { value: Gender; label: string }[] = [
+    { value: "MALE", label: "Мужской" },
+    { value: "FEMALE", label: "Женский" },
+    { value: "UNISEX", label: "Унисекс" },
+  ];
+
+  const SEASON_OPTIONS: { value: Season; label: string }[] = [
+    { value: "SPRING_SUMMER", label: "Весна / Лето" },
+    { value: "AUTUMN_WINTER", label: "Осень / Зима" },
+    { value: "ALL_SEASON", label: "Всесезонный" },
+  ];
+
+  return (
+    <div className={scss.step}>
+      <h2 className={scss.stepTitle}>Характеристики</h2>
+
+      <div className={scss.field}>
+        <label>Размеры (через запятую)</label>
+        <input
+          type="text"
+          placeholder="37, 38, 39, 40, 41, 42"
+          value={data.sizes.join(", ")}
+          onChange={(e) =>
+            onChange(
+              "sizes",
+              e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
+            )
+          }
+        />
+      </div>
+
+      <div className={scss.field}>
+        <label>Цвета (через запятую)</label>
+        <input
+          type="text"
+          placeholder="Чёрный, Белый, Красный или #000000, #FFFFFF"
+          value={data.colors.join(", ")}
+          onChange={(e) =>
+            onChange(
+              "colors",
+              e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
+            )
+          }
+        />
+      </div>
+
+      <div className={scss.fieldRow}>
+        <div className={scss.field}>
+          <label>Материал</label>
+          <input
+            type="text"
+            placeholder="Кожа, Текстиль, Хлопок..."
+            value={data.material || ""}
+            onChange={(e) => onChange("material", e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={scss.fieldRow}>
+        <div className={scss.field}>
+          <label>Пол</label>
+          <select
+            value={data.gender}
+            onChange={(e) => onChange("gender", e.target.value)}
+          >
+            <option value="">— Не указан —</option>
+            {GENDER_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={scss.field}>
+          <label>Сезон</label>
+          <select
+            value={data.season}
+            onChange={(e) => onChange("season", e.target.value)}
+          >
+            <option value="">— Не указан —</option>
+            {SEASON_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+};
+// ─── Step 4: Category ─────────────────────────────────────────────────────────
+const Step4Category: FC<{
   categoryId: number | null;
   onChange: (id: number) => void;
   categories: CategoryWithChildren[];
@@ -300,8 +378,8 @@ const Step3Category: FC<{
   );
 };
 
-// ─── Step 4: Brand ────────────────────────────────────────────────────────────
-const Step4Brand: FC<{ brandName: string; onChange: (v: string) => void }> = ({
+// ─── Step 5: Brand ────────────────────────────────────────────────────────────
+const Step5Brand: FC<{ brandName: string; onChange: (v: string) => void }> = ({
   brandName,
   onChange,
 }) => (
@@ -330,63 +408,116 @@ const Step4Brand: FC<{ brandName: string; onChange: (v: string) => void }> = ({
 // ─── Main Component ───────────────────────────────────────────────────────────
 const CreateProduct: FC = () => {
   const [step, setStep] = useState(1);
+
   const [form, setForm] = useState<FormState>({
     images: [],
     title: "",
     description: "",
-    tags: [],
     price: "",
     newPrice: "",
     stockCount: "",
     categoryId: null,
     brandName: "",
+    sizes: [],
+    colors: [],
+    material: "",
+    gender: "",
+    season: "",
+    isActive: true,
   });
 
-  const { data: categories, isLoading: isLoadingCats } = useGetCategories();
+  const { data: categories = [], isLoading: isLoadingCats } =
+    useGetCategories();
   const { mutate: createProduct, isPending } = useCreateProduct();
 
-  const update = (key: keyof FormState, value: unknown) =>
-    setForm((p) => ({ ...p, [key]: value }));
+  const update = (key: keyof FormState, value: unknown) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const canNext = () => {
     if (step === 1) return form.images.length > 0;
-    if (step === 2)
-      return (
-        !!form.title &&
-        !!form.description &&
-        !!form.price &&
-        (!form.newPrice || Number(form.newPrice) < Number(form.price))
-      );
-    if (step === 3) return !!form.categoryId;
+    if (step === 2) return !!form.title && !!form.description && !!form.price;
+    if (step === 4) return !!form.categoryId;
     return true;
   };
 
   const handleSubmit = () => {
-    try {
-      const formData = new FormData();
-      formData.append("categoryId", String(form.categoryId));
-      formData.append("title", form.title);
-      formData.append("description", form.description);
-      formData.append("price", form.price);
-      if (form.brandName) formData.append("brandName", form.brandName);
-      if (form.newPrice) formData.append("newPrice", form.newPrice);
-      if (form.stockCount) formData.append("stockCount", form.stockCount);
-      if (form.tags.length) formData.append("tags", JSON.stringify(form.tags));
-      form.images.forEach((img) => formData.append("images", img));
-
-      createProduct(formData);
-      toast.success("Товар успешно создан!");
-    } catch (error) {
-      toast.error("Ошибка при создании товара. Попробуйте снова.");
+    if (!form.categoryId) {
+      toast.error("Выберите категорию товара");
+      return;
     }
+
+    if (form.sizes.length === 0) {
+      toast.error("Добавьте хотя бы один размер");
+      return;
+    }
+
+    if (form.colors.length === 0) {
+      toast.error("Добавьте хотя бы один цвет");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("categoryId", String(form.categoryId));
+    formData.append("title", form.title.trim());
+    formData.append("description", form.description.trim());
+    formData.append("price", form.price);
+    formData.append("isActive", String(form.isActive));
+
+    if (form.brandName?.trim())
+      formData.append("brandName", form.brandName.trim());
+    if (form.newPrice?.trim()) formData.append("newPrice", form.newPrice);
+    if (form.stockCount?.trim()) formData.append("stockCount", form.stockCount);
+
+    // ✅ Правильная отправка массивов
+    form.sizes.forEach((size) => formData.append("sizes[]", size)); // ← важно: sizes[]
+    form.colors.forEach((color) => formData.append("colors[]", color)); // ← важно: colors[]
+
+    if (form.material?.trim())
+      formData.append("material", form.material.trim());
+    if (form.gender) formData.append("gender", form.gender);
+    if (form.season) formData.append("season", form.season);
+
+    // Изображения
+    form.images.forEach((image) => formData.append("images", image));
+
+    createProduct(formData, {
+      onSuccess: () => {
+        toast.success("Товар успешно создан!");
+        // Сброс формы
+        setForm({
+          images: [],
+          title: "",
+          description: "",
+          price: "",
+          newPrice: "",
+          stockCount: "",
+          categoryId: null,
+          brandName: "",
+          sizes: [],
+          colors: [],
+          material: "",
+          gender: "",
+          season: "",
+          isActive: true,
+        });
+        setStep(1);
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message || "Ошибка при создании товара",
+        );
+      },
+    });
   };
 
-  const stepLabels = ["Фото", "Инфо", "Категория", "Бренд"];
-
+  const stepLabels = ["Фото", "Инфо", "Характеристики", "Категория", "Бренд"];
   return (
     <section className={scss.CreateProduct}>
       <div className="container">
         <div className={scss.content}>
+          {/* Progress Bar */}
           <div className={scss.progress}>
             {stepLabels.map((label, i) => (
               <div
@@ -410,18 +541,17 @@ const CreateProduct: FC = () => {
               />
             )}
             {step === 2 && <Step2Info data={form} onChange={update} />}
-            {step === 3 && (
-              <Step3Category
+            {step === 3 && <Step3Attributes data={form} onChange={update} />}
+            {step === 4 && (
+              <Step4Category
                 categoryId={form.categoryId}
                 onChange={(id) => update("categoryId", id)}
-                categories={
-                  (categories as unknown as CategoryWithChildren[]) || []
-                }
+                categories={categories as CategoryWithChildren[]}
                 isLoading={isLoadingCats}
               />
             )}
-            {step === 4 && (
-              <Step4Brand
+            {step === 5 && (
+              <Step5Brand
                 brandName={form.brandName}
                 onChange={(v) => update("brandName", v)}
               />
@@ -437,6 +567,7 @@ const CreateProduct: FC = () => {
                 Назад
               </button>
             )}
+
             {step < TOTAL_STEPS ? (
               <button
                 className={scss.btnNext}
@@ -448,10 +579,10 @@ const CreateProduct: FC = () => {
             ) : (
               <button
                 className={scss.btnSubmit}
-                disabled={isPending}
+                disabled={isPending || !form.categoryId}
                 onClick={handleSubmit}
               >
-                {isPending ? "Создание..." : "Создать товар"}
+                {isPending ? "Создаём товар..." : "Создать товар"}
               </button>
             )}
           </div>

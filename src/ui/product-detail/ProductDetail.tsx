@@ -84,7 +84,9 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
             <div className={scss.badges}>
               <div className={scss.ded}>
                 <span className={scss.categoryBadge}>
-                  {product.category?.name}
+                  {product.categoryId
+                    ? `Категория: ${product.categoryId}`
+                    : "Без категории"}
                 </span>
                 <span
                   className={product.isActive ? scss.active : scss.inactive}
@@ -162,17 +164,44 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
                   <span>{product.brandName}</span>
                 </div>
               )}
-            </div>
 
-            {product.tags?.length > 0 && (
-              <div className={scss.tags}>
-                {product.tags.map((tag: string, i: number) => (
-                  <span key={i} className={scss.tag}>
-                    #{tag}
-                  </span>
-                ))}
+              <div className={scss.statItem}>
+                <span>Размер</span>
+                <span>{product.sizes?.join(", ") || "Не указан"}</span>
               </div>
-            )}
+              <div className={scss.statItem}>
+                <span>Цвет</span>
+                <span>{product.colors?.join(", ") || "Не указан"}</span>
+              </div>
+
+              {product.material && (
+                <div className={scss.statItem}>
+                  <span>Материал</span>
+                  <span>{product.material}</span>
+                </div>
+              )}
+
+              {product.gender && (
+                <div className={scss.statItem}>
+                  <span>Пол</span>
+                  <span>{product.gender}</span>
+                </div>
+              )}
+
+              {product.season && (
+                <div className={scss.statItem}>
+                  <span>Сезон</span>
+                  <span>{product.season}</span>
+                </div>
+              )}
+
+              {product.sku && (
+                <div className={scss.statItem}>
+                  <span>Коллекция</span>
+                  <span>{product.sku}</span>
+                </div>
+              )}
+            </div>
 
             {product.archivedAt && (
               <div className={scss.archived}>

@@ -15,20 +15,33 @@ interface Product {
   id: number;
   storeId: number;
   categoryId: number;
+
   title: string;
   description: string;
   images: string[];
-  brandName: string | null;
-  price: string;
-  newPrice: string | null;
+
+  brandName?: string;
+
+  // одежда
+  sku?: string;
+  sizes?: string[];
+  colors?: string[];
+  material?: string;
+  gender?: Gender;
+  season?: Season;
+
+  price: number;
+  newPrice?: number;
+
   stockCount: number;
-  tags: string[];
+  soldCount: number;
+  views: number;
+
   isActive: boolean;
-  archivedAt: string | null;
+  archivedAt?: string | null;
+
   createdAt: string;
   updatedAt: string;
-  category: Category;
-  store?: Store;
 }
 
 interface GetProductsResponse {
@@ -59,7 +72,6 @@ interface CreateProductReq {
   price: number;
   newPrice?: number;
   stockCount?: number;
-  tags?: string[];
   images: File[];
 }
 

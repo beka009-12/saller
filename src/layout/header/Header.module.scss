@@ -1,638 +1,520 @@
-.Header {
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap");
+
+// ── Tokens ────────────────────────────────────────────────────────────────────
+$bg: #ffffff;
+$border: #e8e8e4;
+$text: #111110;
+$muted: #8a8a86;
+$accent: #fb4a1e;
+$radius-sm: 6px;
+$radius-md: 10px;
+$transition: 0.14s ease;
+
+// ── Header shell ──────────────────────────────────────────────────────────────
+.header {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color $transition,
+    box-shadow $transition;
+  font-family: "Geist", sans-serif;
+
+  &.scrolled {
+    border-bottom-color: $border;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  }
 }
 
-.content {
+.inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 70px;
-  gap: 2rem;
+  height: 56px;
+  gap: 24px;
 }
 
-// ===== LEFT SECTION =====
-.leftSection {
-  display: flex;
-  align-items: center;
-  gap: 3rem;
-  flex: 1;
-}
-
-// Logo
+// ── Logo ──────────────────────────────────────────────────────────────────────
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  transition: opacity 0.2s;
+  gap: 8px;
   cursor: pointer;
   flex-shrink: 0;
+  user-select: none;
 
-  &:hover {
-    opacity: 0.8;
-  }
-
-  .logoIcon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #fb4a1e 0%, #ff6b4a 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
-
-  .logoText {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111827;
-
-    span {
-      color: #fb4a1e;
-    }
+  &:hover .logoMark {
+    background: darken(#111110, 5%);
   }
 }
 
-// Navigation
+.logoMark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: $text;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background $transition;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: 17px;
+  font-weight: 600;
+  color: $text;
+  letter-spacing: -0.3px;
+
+  em {
+    font-style: normal;
+    color: $accent;
+  }
+}
+
+// ── Left / Right ──────────────────────────────────────────────────────────────
+.left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  min-width: 0;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+// ── Desktop Nav ───────────────────────────────────────────────────────────────
 .nav {
   display: flex;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 2px;
 }
 
-.navLink {
+.navItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border-radius: 8px;
-  color: #6b7280;
-  text-decoration: none;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: $radius-sm;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.2s;
-  position: relative;
+  color: $muted;
   cursor: pointer;
+  transition:
+    background $transition,
+    color $transition;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
-    background: #f3f4f6;
-    color: #111827;
-  }
-
-  &.active {
-    background: #fff5f3;
-    color: #fb4a1e;
-
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: -2px;
-      left: 1rem;
-      right: 1rem;
-      height: 2px;
-      background: #fb4a1e;
-      border-radius: 2px;
-    }
+    background: #f4f4f2;
+    color: $text;
   }
 }
 
-// ===== RIGHT SECTION =====
-.rightSection {
+// ── Store pill ────────────────────────────────────────────────────────────────
+.storePill {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid $border;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $muted;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-// Store Badge
-.storeBadge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.85rem;
-
-  .storeLabel {
-    color: #9ca3af;
-    font-weight: 500;
-  }
-
-  .storeName {
-    color: #111827;
-    font-weight: 600;
-  }
+.storeIcon {
+  color: $muted;
+  flex-shrink: 0;
 }
 
-// Icon Button
-.iconButton {
+// ── Icon button (bell) ────────────────────────────────────────────────────────
+.iconBtn {
   position: relative;
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  color: #6b7280;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  background: $bg;
+  color: $muted;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition:
+    background $transition,
+    border-color $transition,
+    color $transition;
   flex-shrink: 0;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #111827;
+    background: #f4f4f2;
+    border-color: #ccc;
+    color: $text;
   }
 
-  &:active {
-    transform: scale(0.95);
+  &.active {
+    background: $text;
+    border-color: $text;
+    color: #fff;
   }
 }
 
-// Badge
-.badge {
+.dot {
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #ef4444;
-  color: white;
-  font-size: 0.7rem;
+  min-width: 17px;
+  height: 17px;
+  background: $accent;
+  color: #fff;
+  font-size: 10px;
   font-weight: 700;
-  padding: 0.125rem 0.4rem;
-  border-radius: 999px;
-  min-width: 18px;
-  height: 18px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  padding: 0 4px;
+  border: 2px solid $bg;
 }
 
-// Backdrop
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: transparent;
-}
-
-// ===== BURGER BUTTON =====
-.burgerButton {
-  display: none;
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  color: #6b7280;
-  cursor: pointer;
+// ── User button ───────────────────────────────────────────────────────────────
+.userBtn {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  flex-shrink: 0;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  background: $bg;
+  cursor: pointer;
+  transition:
+    background $transition,
+    border-color $transition;
+  font-family: inherit;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    color: #111827;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-// ===== MOBILE MENU =====
-.mobileMenuBackdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px);
-  animation: fadeIn 0.2s ease;
-}
-
-.mobileMenu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 280px;
-  background: #ffffff;
-  z-index: 91;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
-  animation: slideInLeft 0.25s ease;
-  overflow-y: auto;
-}
-
-.mobileMenuHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.25rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.mobileMenuClose {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: none;
-  color: #6b7280;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #111827;
-  }
-}
-
-.mobileNav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 1rem;
-  flex: 1;
-}
-
-.mobileNavLink {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  border-radius: 10px;
-  color: #6b7280;
-  font-weight: 500;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: #f4f4f2;
+    border-color: #ccc;
   }
 
   &.active {
-    background: #fff5f3;
-    color: #fb4a1e;
+    border-color: $text;
   }
 }
 
-.mobileMenuFooter {
-  padding: 1rem;
-  border-top: 1px solid #f3f4f6;
-}
-
-.mobileStoreBadge {
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: #f0ede8;
+  color: $muted;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  margin-bottom: 0.75rem;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
 
-  .storeLabel {
-    color: #9ca3af;
-    font-weight: 500;
-  }
-
-  .storeName {
-    color: #111827;
-    font-weight: 600;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-// ===== NOTIFICATIONS =====
-.notificationWrapper {
+.userName {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: $muted;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+// ── Popover shared ────────────────────────────────────────────────────────────
+.popoverAnchor {
   position: relative;
 }
 
-.notificationDropdown {
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+
+.popover {
   position: absolute;
-  top: calc(100% + 0.75rem);
+  top: calc(100% + 8px);
   right: 0;
-  width: 380px;
-  background: white;
+  min-width: 280px;
+  background: $bg;
+  border: 1px solid $border;
   border-radius: 12px;
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e5e7eb;
   overflow: hidden;
-  animation: slideDown 0.2s ease;
   z-index: 50;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  animation: popIn 0.15s ease;
 }
 
-.dropdownHeader {
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ── Notifications popover ─────────────────────────────────────────────────────
+.popoverHead {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #f3f4f6;
-  background: #fafafa;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid $border;
 
-  h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #111827;
-  }
-
-  .closeBtn {
-    background: none;
-    border: none;
-    font-size: 1.75rem;
-    color: #9ca3af;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    transition: all 0.2s;
-
-    &:hover {
-      background: #f3f4f6;
-      color: #111827;
-    }
+  span:first-child {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: $muted;
   }
 }
 
-.notificationList {
-  max-height: 400px;
-  overflow-y: auto;
+.unreadBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #fff0ec;
+  color: $accent;
 }
 
-.notificationItem {
+.notifList {
+  display: flex;
+  flex-direction: column;
+}
+
+.notifRow {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #f3f4f6;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid $border;
   cursor: pointer;
-  transition: background 0.2s;
-  gap: 0.75rem;
-
-  &:hover {
-    background: #f9fafb;
-  }
+  transition: background $transition;
 
   &:last-child {
     border-bottom: none;
   }
 
+  &:hover {
+    background: #fafaf8;
+  }
+
   &.unread {
-    background: #eff6ff;
-
-    &:hover {
-      background: #dbeafe;
-    }
+    background: #fdf8f7;
   }
-
-  .notifContent {
-    flex: 1;
-
-    p {
-      margin: 0 0 0.25rem 0;
-      color: #111827;
-      font-size: 0.9rem;
-      font-weight: 500;
-      line-height: 1.4;
-    }
-
-    .time {
-      color: #9ca3af;
-      font-size: 0.8rem;
-    }
-  }
-
-  .unreadDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #3b82f6;
-    flex-shrink: 0;
-    margin-top: 0.4rem;
+  &.unread:hover {
+    background: #faf2f0;
   }
 }
 
-.emptyState {
+.notifIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-sm;
+  background: #f4f4f2;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1.5rem;
-  color: #9ca3af;
+  flex-shrink: 0;
+  color: $muted;
 
-  svg {
-    margin-bottom: 1rem;
-    opacity: 0.5;
+  .unread & {
+    background: #fff0ec;
+    color: $accent;
   }
+}
+
+.notifText {
+  flex: 1;
+  min-width: 0;
 
   p {
-    margin: 0;
-    font-size: 0.9rem;
+    margin: 0 0 3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: $text;
+    line-height: 1.4;
+  }
+
+  time {
+    font-size: 11px;
+    color: $muted;
   }
 }
 
-// ===== USER MENU =====
-.userWrapper {
-  position: relative;
+.unreadDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: $accent;
+  flex-shrink: 0;
+  margin-top: 5px;
 }
 
-.userButton {
+// ── User popover ──────────────────────────────────────────────────────────────
+.userHead {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid $border;
+  background: #fafaf8;
+}
+
+.avatarLg {
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #fb4a1e 0%, #ff6b4a 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  .userInfo {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-
-    .userName {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #111827;
-      line-height: 1.2;
-    }
-  }
-
-  .chevron {
-    color: #9ca3af;
-    transition: transform 0.2s;
-  }
-
-  &:hover .chevron {
-    color: #6b7280;
-  }
-}
-
-.userDropdown {
-  position: absolute;
-  top: calc(100% + 0.75rem);
-  right: 0;
-  width: 280px;
-  background: white;
-  border-radius: 12px;
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border: 1px solid #e5e7eb;
+  background: #f0ede8;
+  color: $muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  animation: slideDown 0.2s ease;
-  z-index: 50;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
-.userDropdownHeader {
-  padding: 1.25rem;
-  border-bottom: 1px solid #f3f4f6;
-  background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+.userNameLg {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: $muted;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuList {
+  padding: 6px;
+}
+
+.menuRow {
   display: flex;
   align-items: center;
-  gap: 1rem;
-
-  .avatarLarge {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #fb4a1e 0%, #ff6b4a 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  .userDetails {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .userNameLarge {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .userEmail {
-    font-size: 0.8rem;
-    color: #6b7280;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.menuItems {
-  padding: 0.5rem;
-}
-
-.menuItem {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #111827;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
+  gap: 8px;
+  padding: 9px 10px;
   border: none;
-  background: none;
+  border-radius: $radius-sm;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text;
+  text-decoration: none;
+  cursor: pointer;
   width: 100%;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-  }
+  transition:
+    background $transition,
+    color $transition;
 
   svg {
-    color: #6b7280;
+    color: $muted;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #f4f4f2;
+  }
+
+  &.danger {
+    color: #c0392b;
+    svg {
+      color: #c0392b;
+    }
+    &:hover {
+      background: #fff0ee;
+    }
   }
 }
 
-.divider {
-  margin: 0.5rem 0;
-  border: none;
-  border-top: 1px solid #f3f4f6;
+// ── Login button ──────────────────────────────────────────────────────────────
+.loginBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid $text;
+  border-radius: 20px;
+  background: $text;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity $transition;
+
+  &:hover {
+    opacity: 0.82;
+  }
 }
 
-// ===== SKELETON =====
-.skeletonUser {
-  width: 120px;
-  height: 42px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+.skeleton {
+  width: 110px;
+  height: 36px;
+  border-radius: $radius-md;
+  background: linear-gradient(90deg, #f0f0ee 25%, #e6e6e4 50%, #f0f0ee 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
@@ -646,154 +528,224 @@
   }
 }
 
-// ===== LOGIN BUTTON =====
-.loginButton {
-  display: flex;
+// ── Burger ────────────────────────────────────────────────────────────────────
+.burger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  background: $bg;
+  color: $muted;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  height: 42px;
-  border-radius: 10px;
-  border: 1.5px solid #e5e7eb;
-  background: #ffffff;
-  color: #111827;
-  font-size: 0.9rem;
-  font-weight: 600;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    background $transition,
+    color $transition;
   flex-shrink: 0;
 
-  svg {
-    color: #6b7280;
-    transition: color 0.2s;
-  }
-
   &:hover {
-    background: #fb4a1e;
-    border-color: #fb4a1e;
-    color: #ffffff;
-
-    svg {
-      color: #ffffff;
-    }
-  }
-
-  &:active {
-    transform: scale(0.97);
+    background: #f4f4f2;
+    color: $text;
   }
 }
 
-// ===== ANIMATIONS =====
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
+// ── Mobile Drawer ─────────────────────────────────────────────────────────────
+.drawerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+  backdrop-filter: blur(2px);
+
+  &.drawerOpen {
     opacity: 1;
-    transform: translateY(0);
+    pointer-events: auto;
   }
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-  to {
-    opacity: 1;
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: $bg;
+  z-index: 91;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  border-right: 1px solid $border;
+
+  &.drawerOpen {
     transform: translateX(0);
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+.drawerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid $border;
+}
+
+.drawerClose {
+  width: 32px;
+  height: 32px;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  background: transparent;
+  color: $muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background $transition;
+
+  &:hover {
+    background: #f4f4f2;
+    color: $text;
   }
 }
 
-// ===== RESPONSIVE =====
+.drawerStore {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 12px 0;
+  padding: 8px 10px;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  font-size: 12px;
+  font-weight: 500;
+  color: $muted;
+  background: #fafaf8;
+}
 
-// Планшет
+.drawerNav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  flex: 1;
+}
+
+.drawerNavItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: $radius-sm;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: $muted;
+  cursor: pointer;
+  transition:
+    background $transition,
+    color $transition;
+  text-align: left;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #f4f4f2;
+    color: $text;
+  }
+}
+
+.drawerFooter {
+  padding: 12px;
+  border-top: 1px solid $border;
+}
+
+.drawerLogout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: $radius-sm;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #c0392b;
+  cursor: pointer;
+  width: 100%;
+  transition: background $transition;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #fff0ee;
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
 @media (max-width: 1024px) {
-  .storeBadge {
+  .storePill {
     display: none;
   }
-
-  .leftSection {
-    gap: 2rem;
-  }
 }
 
-// Мобилка
 @media (max-width: 768px) {
-  .content {
-    height: 60px;
-    gap: 0;
+  .inner {
+    height: 52px;
   }
 
-  .leftSection {
-    gap: 0;
-    flex: 1;
-  }
-
-  // Десктопная навигация — скрыта
   .nav {
     display: none;
   }
 
-  // Бургер — виден
-  .burgerButton {
+  .burger {
     display: flex;
-    margin-right: 0.5rem;
-    order: -1; // слева от лого
   }
 
-  .logo {
-    .logoText {
-      font-size: 1.25rem;
-    }
+  .left {
+    gap: 10px;
   }
 
-  // Правая часть — только иконки
-  .rightSection {
-    gap: 0.5rem;
+  .right {
+    gap: 4px;
   }
 
-  .storeBadge {
+  .userName {
     display: none;
   }
 
-  .userButton {
-    padding: 0.375rem;
+  .userBtn {
+    padding: 4px;
     gap: 0;
-
-    .userInfo,
     .chevron {
       display: none;
     }
   }
 
-  // Дропдауны — на всю ширину экрана
-  .notificationDropdown {
-    width: calc(100vw - 1rem);
-    right: -0.5rem;
-  }
-
-  .userDropdown {
-    width: calc(100vw - 1rem);
-    right: -0.5rem;
+  .popover {
+    width: calc(100vw - 24px);
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 360px;
   }
 }
 
-// Очень маленькие экраны
 @media (max-width: 360px) {
-  .logo {
-    .logoText {
-      display: none;
-    }
+  .logoText {
+    display: none;
   }
 }

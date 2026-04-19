@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useEffect, type FC } from "react";
 import { useRouter } from "next/navigation";
@@ -17,6 +16,7 @@ import {
   LogIn,
   Menu,
   X,
+  AlertCircle,
 } from "lucide-react";
 
 const Header: FC = () => {
@@ -25,6 +25,7 @@ const Header: FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (!isLoading && (!seller || isError)) {
@@ -44,13 +45,14 @@ const Header: FC = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Блокируем скролл когда мобильное меню открыто
   useEffect(() => {
-    if (showMobileMenu) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = showMobileMenu ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -76,7 +78,7 @@ const Header: FC = () => {
     },
     {
       id: 2,
-      text: "Товар 'iPhone 14' - осталось 2 шт",
+      text: "Товар 'iPhone 14' — осталось 2 шт",
       time: "1 час назад",
       unread: true,
     },
@@ -85,124 +87,120 @@ const Header: FC = () => {
   const unreadCount = notifications.filter((n) => n.unread).length;
   const isAuthorized = !isLoading && !!seller && !isError;
 
+  const navItems = [
+    { label: "Главная", path: "/", icon: <LayoutDashboard size={15} /> },
+    { label: "Товары", path: "/products", icon: <Package size={15} /> },
+    { label: "Заказы", path: "/orders", icon: <ShoppingBag size={15} /> },
+  ];
+
   return (
     <>
-      <header className={scss.Header}>
+      <header className={`${scss.header} ${scrolled ? scss.scrolled : ""}`}>
         <div className="container">
-          <div className={scss.content}>
-            <div className={scss.leftSection}>
+          <div className={scss.inner}>
+            {/* Left */}
+            <div className={scss.left}>
               <button
-                className={scss.burgerButton}
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className={scss.burger}
+                onClick={() => setShowMobileMenu(true)}
                 aria-label="Открыть меню"
               >
-                <Menu size={20} />
+                <Menu size={18} />
               </button>
 
-              {/* Логотип */}
-              <div onClick={() => router.push("/")} className={scss.logo}>
-                <div className={scss.logoIcon}>
-                  <Store size={24} />
+              <div className={scss.logo} onClick={() => router.push("/")}>
+                <div className={scss.logoMark}>
+                  <Store size={16} strokeWidth={2.5} />
                 </div>
-                <div className={scss.logoText}>
-                  Sell<span>ix</span>
-                </div>
+                <span className={scss.logoText}>
+                  Sell<em>ix</em>
+                </span>
               </div>
 
-              {/* Навигация — только десктоп */}
               <nav className={scss.nav}>
-                <p onClick={() => router.push("/")} className={scss.navLink}>
-                  <LayoutDashboard size={18} />
-                  <span>Главная</span>
-                </p>
-                <p
-                  onClick={() => router.push("/products")}
-                  className={scss.navLink}
-                >
-                  <Package size={18} />
-                  <span>Товары</span>
-                </p>
-                <p
-                  onClick={() => router.push("/orders")}
-                  className={scss.navLink}
-                >
-                  <ShoppingBag size={18} />
-                  <span>Заказы</span>
-                </p>
+                {navItems.map(({ label, path, icon }) => (
+                  <button
+                    key={path}
+                    className={scss.navItem}
+                    onClick={() => router.push(path)}
+                  >
+                    {icon}
+                    {label}
+                  </button>
+                ))}
               </nav>
             </div>
 
-            {/* Правая часть */}
-            <div className={scss.rightSection}>
-              {/* Загрузка */}
-              {isLoading && <div className={scss.skeletonUser} />}
+            {/* Right */}
+            <div className={scss.right}>
+              {isLoading && <div className={scss.skeleton} />}
 
-              {/* Не авторизован */}
               {!isLoading && !isAuthorized && (
                 <button
-                  className={scss.loginButton}
+                  className={scss.loginBtn}
                   onClick={() => router.push("/register")}
                 >
-                  <LogIn size={18} />
-                  <span>Войти</span>
+                  <LogIn size={15} />
+                  Войти
                 </button>
               )}
 
-              {/* Авторизован */}
               {isAuthorized && seller && (
                 <>
-                  {seller.user.name && (
-                    <div className={scss.storeBadge}>
-                      <span className={scss.storeLabel}>Магазин:</span>
-                      <span className={scss.storeName}>
-                        {seller.user.stores[0]?.name || "Название магазина"}
-                      </span>
+                  {seller.user.stores[0]?.name && (
+                    <div className={scss.storePill}>
+                      <Store size={12} className={scss.storeIcon} />
+                      <span>{seller.user.stores[0].name}</span>
                     </div>
                   )}
 
-                  {/* Уведомления */}
-                  <div className={scss.notificationWrapper}>
+                  {/* Bell */}
+                  <div className={scss.popoverAnchor}>
                     <button
-                      className={scss.iconButton}
+                      className={`${scss.iconBtn} ${showNotifications ? scss.active : ""}`}
                       onClick={() => {
                         setShowNotifications(!showNotifications);
                         setShowUserMenu(false);
                       }}
                       aria-label="Уведомления"
                     >
-                      <Bell size={20} />
+                      <Bell size={17} />
                       {unreadCount > 0 && (
-                        <span className={scss.badge}>{unreadCount}</span>
+                        <span className={scss.dot}>{unreadCount}</span>
                       )}
                     </button>
 
                     {showNotifications && (
                       <>
                         <div
-                          className={scss.backdrop}
+                          className={scss.veil}
                           onClick={() => setShowNotifications(false)}
                         />
-                        <div className={scss.notificationDropdown}>
-                          <div className={scss.dropdownHeader}>
-                            <h3>Уведомления</h3>
-                            <button
-                              className={scss.closeBtn}
-                              onClick={() => setShowNotifications(false)}
-                            >
-                              ×
-                            </button>
+                        <div className={scss.popover}>
+                          <div className={scss.popoverHead}>
+                            <span>Уведомления</span>
+                            {unreadCount > 0 && (
+                              <span className={scss.unreadBadge}>
+                                {unreadCount} новых
+                              </span>
+                            )}
                           </div>
-                          <div className={scss.notificationList}>
+                          <div className={scss.notifList}>
                             {notifications.map((n) => (
                               <div
                                 key={n.id}
-                                className={`${scss.notificationItem} ${n.unread ? scss.unread : ""}`}
+                                className={`${scss.notifRow} ${n.unread ? scss.unread : ""}`}
                               >
-                                <div className={scss.notifContent}>
-                                  <p>{n.text}</p>
-                                  <span className={scss.time}>{n.time}</span>
+                                <div className={scss.notifIcon}>
+                                  <AlertCircle size={14} />
                                 </div>
-                                {n.unread && <div className={scss.unreadDot} />}
+                                <div className={scss.notifText}>
+                                  <p>{n.text}</p>
+                                  <time>{n.time}</time>
+                                </div>
+                                {n.unread && (
+                                  <span className={scss.unreadDot} />
+                                )}
                               </div>
                             ))}
                           </div>
@@ -211,15 +209,15 @@ const Header: FC = () => {
                     )}
                   </div>
 
-                  {/* Профиль */}
-                  <div className={scss.userWrapper}>
+                  {/* User */}
+                  <div className={scss.popoverAnchor}>
                     <button
-                      className={scss.userButton}
+                      className={`${scss.userBtn} ${showUserMenu ? scss.active : ""}`}
                       onClick={() => {
                         setShowUserMenu(!showUserMenu);
                         setShowNotifications(false);
                       }}
-                      aria-label="Меню пользователя"
+                      aria-label="Профиль"
                     >
                       <div className={scss.avatar}>
                         {seller.user.avatar ? (
@@ -228,52 +226,60 @@ const Header: FC = () => {
                             alt={seller.user.name}
                           />
                         ) : (
-                          <User size={18} />
+                          <User size={15} />
                         )}
                       </div>
-                      <div className={scss.userInfo}>
-                        <span className={scss.userName}>
-                          {seller.user.name || "Продавец"}
-                        </span>
-                      </div>
-                      <ChevronDown size={16} className={scss.chevron} />
+                      <span className={scss.userName}>
+                        {seller.user.name || "Продавец"}
+                      </span>
+                      <ChevronDown
+                        size={13}
+                        className={`${scss.chevron} ${showUserMenu ? scss.open : ""}`}
+                      />
                     </button>
 
                     {showUserMenu && (
                       <>
                         <div
-                          className={scss.backdrop}
+                          className={scss.veil}
                           onClick={() => setShowUserMenu(false)}
                         />
-                        <div className={scss.userDropdown}>
-                          <div className={scss.userDropdownHeader}>
-                            <div className={scss.avatarLarge}>
+                        <div className={scss.popover}>
+                          <div className={scss.userHead}>
+                            <div className={scss.avatarLg}>
                               {seller.user.avatar ? (
                                 <img
                                   src={seller.user.avatar}
                                   alt={seller.user.name}
                                 />
                               ) : (
-                                <User size={24} />
+                                <User size={20} />
                               )}
                             </div>
-                            <div className={scss.userDetails}>
-                              <div className={scss.userNameLarge}>
+                            <div>
+                              <p className={scss.userNameLg}>
                                 {seller.user.name || "Продавец"}
-                              </div>
-                              <div className={scss.userEmail}>
+                              </p>
+                              <p className={scss.userEmail}>
                                 {seller.user.email}
-                              </div>
+                              </p>
                             </div>
                           </div>
-                          <div className={scss.menuItems}>
+                          <div className={scss.menuList}>
                             <a
                               href="/seller/store-settings"
-                              className={scss.menuItem}
+                              className={scss.menuRow}
                             >
-                              <Settings size={18} />
-                              <span>Настройки магазина</span>
+                              <Settings size={15} />
+                              Настройки магазина
                             </a>
+                            <button
+                              className={`${scss.menuRow} ${scss.danger}`}
+                              onClick={handleLogout}
+                            >
+                              <LogOut size={15} />
+                              Выйти
+                            </button>
                           </div>
                         </div>
                       </>
@@ -286,84 +292,67 @@ const Header: FC = () => {
         </div>
       </header>
 
-      {/* ===== МОБИЛЬНОЕ МЕНЮ ===== */}
-      {showMobileMenu && (
-        <>
-          <div
-            className={scss.mobileMenuBackdrop}
-            onClick={() => setShowMobileMenu(false)}
-          />
-          <div className={scss.mobileMenu}>
-            {/* Шапка мобильного меню */}
-            <div className={scss.mobileMenuHeader}>
-              <div className={scss.logo}>
-                <div className={scss.logoIcon}>
-                  <Store size={20} />
-                </div>
-                <div className={scss.logoText}>
-                  Sell<span>ix</span>
-                </div>
-              </div>
-              <button
-                className={scss.mobileMenuClose}
-                onClick={() => setShowMobileMenu(false)}
-                aria-label="Закрыть меню"
-              >
-                <X size={20} />
-              </button>
+      {/* Mobile drawer */}
+      <div
+        className={`${scss.drawerBackdrop} ${showMobileMenu ? scss.drawerOpen : ""}`}
+        onClick={() => setShowMobileMenu(false)}
+      />
+
+      <div
+        className={`${scss.drawer} ${showMobileMenu ? scss.drawerOpen : ""}`}
+      >
+        <div className={scss.drawerHead}>
+          <div className={scss.logo}>
+            <div className={scss.logoMark}>
+              <Store size={14} strokeWidth={2.5} />
             </div>
-
-            {/* Навигация */}
-            <nav className={scss.mobileNav}>
-              <p
-                onClick={() => handleNavigate("/")}
-                className={scss.mobileNavLink}
-              >
-                <LayoutDashboard size={20} />
-                <span>Главная</span>
-              </p>
-              <p
-                onClick={() => handleNavigate("/products")}
-                className={scss.mobileNavLink}
-              >
-                <Package size={20} />
-                <span>Товары</span>
-              </p>
-              <p
-                onClick={() => handleNavigate("/orders")}
-                className={scss.mobileNavLink}
-              >
-                <ShoppingBag size={20} />
-                <span>Заказы</span>
-              </p>
-            </nav>
-
-            {isAuthorized && seller && (
-              <div className={scss.mobileMenuFooter}>
-                {seller.user.stores[0]?.name && (
-                  <div className={scss.mobileStoreBadge}>
-                    <Store size={16} />
-                    <span className={scss.storeLabel}>Магазин:</span>
-                    <span className={scss.storeName}>
-                      {seller.user.stores[0].name}
-                    </span>
-                  </div>
-                )}
-                <button
-                  className={scss.menuItem}
-                  onClick={() => {
-                    handleLogout();
-                    setShowMobileMenu(false);
-                  }}
-                >
-                  <LogOut size={18} />
-                  <span>Выйти</span>
-                </button>
-              </div>
-            )}
+            <span className={scss.logoText}>
+              Sell<em>ix</em>
+            </span>
           </div>
-        </>
-      )}
+          <button
+            className={scss.drawerClose}
+            onClick={() => setShowMobileMenu(false)}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {isAuthorized && seller?.user.stores[0]?.name && (
+          <div className={scss.drawerStore}>
+            <Store size={13} />
+            <span>{seller.user.stores[0].name}</span>
+          </div>
+        )}
+
+        <nav className={scss.drawerNav}>
+          {navItems.map(({ label, path, icon }) => (
+            <button
+              key={path}
+              className={scss.drawerNavItem}
+              onClick={() => handleNavigate(path)}
+            >
+              {icon}
+              {label}
+            </button>
+          ))}
+        </nav>
+
+        {isAuthorized && (
+          <div className={scss.drawerFooter}>
+            <button
+              className={scss.drawerLogout}
+              onClick={() => {
+                handleLogout();
+                setShowMobileMenu(false);
+              }}
+            >
+              <LogOut size={15} />
+              Выйти из аккаунта
+            </button>
+          </div>
+        )}
+      </div>
     </>
   );
 };

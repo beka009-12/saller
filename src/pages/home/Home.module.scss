@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap");
 
 $bg: #ffffff;
 $bg-soft: #faf9f8;
@@ -7,32 +7,18 @@ $text: #111110;
 $muted: #888884;
 $primary: #fb4a1e;
 $radius: 6px;
-$success: #15803d;
-$warning: #b45309;
-$danger: #b91c1c;
 
+// ── Dashboard wrapper ─────────────────────────────────────────────────────────
 .dashboard {
-  font-family: "Inter", sans-serif;
-  padding-bottom: 80px;
-
-  * {
-    box-sizing: border-box;
-  }
+  font-family: "Geist", "Inter", sans-serif;
 }
 
 // ── Page header ───────────────────────────────────────────────────────────────
 .header {
-  padding: 36px 0 28px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+  padding: 32px 0 20px;
 
-.headerLeft {
   h1 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     letter-spacing: -0.3px;
     margin: 0 0 4px;
@@ -46,58 +32,105 @@ $danger: #b91c1c;
   }
 }
 
-// ── Stats bar (стиль Order) ───────────────────────────────────────────────────
-.statsBar {
+// ── Stats grid — 6 карточек ───────────────────────────────────────────────────
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.statCard {
+  background: $bg-soft;
+  border-radius: $radius;
+  padding: 14px 16px;
+  position: relative;
+
+  &.accentOrders {
+    border-left: 3px solid #f97316;
+  }
+
+  &.accentStock {
+    border-left: 3px solid #ef4444;
+  }
+}
+
+.statIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  background: $bg;
-  border: 1px solid $border;
-  border-radius: $radius;
-  overflow: hidden;
-  flex-wrap: nowrap;
-}
+  justify-content: center;
+  margin-bottom: 10px;
 
-.statItem {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 20px;
-  flex-shrink: 0;
-}
+  &.iconOrange {
+    background: #fff7ed;
+    color: #f97316;
+  }
 
-.statNum {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1;
-  color: $text;
+  &.iconBlue {
+    background: #eff6ff;
+    color: #3b82f6;
+  }
+
+  &.iconGreen {
+    background: #f0fdf4;
+    color: #22c55e;
+  }
+
+  &.iconPurple {
+    background: #faf5ff;
+    color: #a855f7;
+  }
+
+  &.iconRed {
+    background: #fef2f2;
+    color: #ef4444;
+  }
+
+  &.iconAmber {
+    background: #fffbeb;
+    color: #f59e0b;
+  }
 }
 
 .statLabel {
   font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
   color: $muted;
-  white-space: nowrap;
+  margin-bottom: 4px;
 }
 
-.statDivider {
-  width: 1px;
-  height: 36px;
-  background: $border;
-  flex-shrink: 0;
+.statVal {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  color: $text;
+}
+
+.statSub {
+  font-size: 11px;
+  color: $muted;
+  margin-top: 4px;
 }
 
 // ── Quick actions ─────────────────────────────────────────────────────────────
 .quickActions {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
 .actionBtn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border: 1px solid $border;
   border-radius: 20px;
   background: $bg;
@@ -116,9 +149,10 @@ $danger: #b91c1c;
     background: $text;
     border-color: $text;
     color: #fff;
+    font-weight: 500;
 
     &:hover {
-      opacity: 0.85;
+      opacity: 0.82;
     }
   }
 
@@ -130,18 +164,18 @@ $danger: #b91c1c;
 // ── Main grid ─────────────────────────────────────────────────────────────────
 .mainGrid {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 16px;
+  grid-template-columns: 1fr 320px;
+  gap: 14px;
   align-items: start;
 }
 
-// ── Card (общий контейнер) ────────────────────────────────────────────────────
+// ── Card ──────────────────────────────────────────────────────────────────────
 .card {
   background: $bg;
   border: 1px solid $border;
   border-radius: $radius;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 
   &:last-child {
     margin-bottom: 0;
@@ -152,12 +186,12 @@ $danger: #b91c1c;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 11px 14px;
   border-bottom: 1px solid $border;
   background: $bg-soft;
 
   h2 {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.7px;
@@ -194,9 +228,9 @@ $danger: #b91c1c;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.6px;
     color: $muted;
-    padding: 10px 16px;
+    padding: 9px 14px;
     text-align: left;
     border-bottom: 1px solid $border;
     background: $bg-soft;
@@ -204,7 +238,7 @@ $danger: #b91c1c;
   }
 
   td {
-    padding: 13px 16px;
+    padding: 12px 14px;
     border-bottom: 1px solid $border;
     font-size: 13px;
     color: $text;
@@ -224,37 +258,59 @@ $danger: #b91c1c;
 }
 
 .orderId {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: $muted;
+}
+
+.orderDate {
+  font-size: 12px;
+  color: $muted;
+  white-space: nowrap;
 }
 
 .amount {
   font-weight: 600;
 }
 
-// ── Status pills (унифицировано с Order) ─────────────────────────────────────
+// ── Status pills ──────────────────────────────────────────────────────────────
 .status {
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .pending {
-  background: #fff8e1;
-  color: #b45309;
+  background: #fff7ed;
+  color: #c2410c;
 }
+
 .paid {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
-.shipped {
-  background: #ede9fe;
-  color: #6d28d9;
+
+// ── Process button ────────────────────────────────────────────────────────────
+.processBtn {
+  padding: 4px 10px;
+  border: 1px solid $border;
+  border-radius: 20px;
+  background: $bg;
+  font-family: inherit;
+  font-size: 12px;
+  color: $muted;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+
+  &:hover {
+    border-color: #bbb;
+    color: $text;
+  }
 }
 
 // ── Low stock ─────────────────────────────────────────────────────────────────
@@ -262,11 +318,11 @@ $danger: #b91c1c;
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  padding: 12px 16px;
-  background: #fff8e1;
-  border-bottom: 1px solid #fde68a;
-  font-size: 13px;
-  color: #b45309;
+  padding: 11px 14px;
+  background: #fefce8;
+  border-bottom: 1px solid #fde047;
+  font-size: 12px;
+  color: #92400e;
   line-height: 1.5;
 
   svg {
@@ -284,9 +340,9 @@ $danger: #b91c1c;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 11px 16px;
+  padding: 11px 14px;
   border-bottom: 1px solid $border;
-  gap: 12px;
+  gap: 10px;
   transition: background 0.1s;
 
   &:last-child {
@@ -317,85 +373,149 @@ $danger: #b91c1c;
   flex-shrink: 0;
 
   &.critical {
-    background: #fee2e2;
-    color: $danger;
+    background: #fef2f2;
+    color: #b91c1c;
   }
 
   &.warning {
-    background: #fef3c7;
-    color: $warning;
+    background: #fffbeb;
+    color: #b45309;
   }
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────
-@media (max-width: 1024px) {
-  .mainGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .statsBar {
-    width: 100%;
-
-    .statItem {
-      flex: 1;
-      padding: 10px 12px;
-    }
+@media (max-width: 1100px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 768px) {
-  .header {
-    padding: 20px 0 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+@media (max-width: 860px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .statsBar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-
-    .statNum {
-      font-size: 15px;
-    }
-
-    .statLabel {
-      font-size: 10px;
-    }
+  .header {
+    padding: 20px 0 16px;
   }
 
   .orderTable {
+    th:first-child,
+    td:first-child {
+      display: none;
+    }
+
     th,
     td {
       padding: 10px 12px;
       font-size: 12px;
     }
   }
-
-  // Скрываем колонку ID на совсем маленьких
-  .orderTable th:first-child,
-  .orderTable td:first-child {
-    display: none;
-  }
 }
 
 @media (max-width: 400px) {
-  .statsBar {
-    flex-direction: column;
-
-    .statDivider {
-      width: 100%;
-      height: 1px;
-    }
-
-    .statItem {
-      flex-direction: row;
-      justify-content: space-between;
-      padding: 8px 14px;
-    }
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .quickActions {
     gap: 6px;
   }
+}
+
+// ── Rating block ──────────────────────────────────────────────────────────────
+.ratingBody {
+  padding: 14px 14px 6px;
+}
+
+.ratingTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ratingAvg {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  color: $text;
+  line-height: 1;
+}
+
+.ratingMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ratingStars {
+  display: flex;
+  gap: 2px;
+}
+
+.starFilled {
+  color: #f59e0b;
+  fill: #f59e0b;
+}
+
+.starEmpty {
+  color: #e4e4e0;
+  fill: #e4e4e0;
+}
+
+.ratingTotal {
+  font-size: 12px;
+  color: $muted;
+}
+
+.ratingBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 8px;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ratingRowLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: $muted;
+  width: 10px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.ratingBar {
+  flex: 1;
+  height: 6px;
+  background: $border;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ratingBarFill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.ratingRowCount {
+  font-size: 12px;
+  color: $muted;
+  width: 24px;
+  flex-shrink: 0;
+  text-align: right;
 }

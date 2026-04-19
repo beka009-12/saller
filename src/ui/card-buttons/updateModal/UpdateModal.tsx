@@ -35,11 +35,23 @@ const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
         data: {
           title: formData.get("title") as string,
           description: formData.get("description") as string,
-          price: formData.get("price") as string,
-          newPrice: (formData.get("newPrice") as string) || null,
+          price: Number(formData.get("price")),
+          newPrice: Number(formData.get("newPrice")),
           stockCount: Number(formData.get("stockCount")),
-          brandName: (formData.get("brandName") as string) || null,
-          tags: tagsValue ? tagsValue.split(",").map((t) => t.trim()) : [],
+          brandName: (formData.get("brandName") as string) || undefined,
+          season: (formData.get("season") as string) || undefined,
+          sizes:
+            (formData.get("size") as string)
+              ?.split(",")
+              .map((s) => s.trim())
+              .filter(Boolean) || undefined,
+          colors:
+            (formData.get("color") as string)
+              ?.split(",")
+              .map((s) => s.trim())
+              .filter(Boolean) || undefined,
+          material: (formData.get("material") as string) || undefined,
+          gender: (formData.get("gender") as string) || undefined,
         },
       },
       { onSuccess: onClose },
@@ -147,11 +159,47 @@ const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
           </div>
 
           <div className={scss.field}>
-            <label>Теги (через запятую)</label>
+            <label>Размер</label>
             <input
-              name="tags"
-              defaultValue={product.tags.join(", ")}
-              placeholder="nike, air, кроссовки"
+              name="size"
+              defaultValue={product.sizes?.join(", ") || ""}
+              placeholder="Размер"
+            />
+          </div>
+
+          <div className={scss.field}>
+            <label>Цвет</label>
+            <input
+              name="color"
+              defaultValue={product.colors?.join(", ") || ""}
+              placeholder="Цвет"
+            />
+          </div>
+
+          <div className={scss.field}>
+            <label>Материал</label>
+            <input
+              name="material"
+              defaultValue={product.material ?? ""}
+              placeholder="Материал"
+            />
+          </div>
+
+          <div className={scss.field}>
+            <label>Сезон</label>
+            <input
+              name="season"
+              defaultValue={product.season ?? ""}
+              placeholder="Сезон"
+            />
+          </div>
+
+          <div className={scss.field}>
+            <label>Пол</label>
+            <input
+              name="gender"
+              defaultValue={product.gender ?? ""}
+              placeholder="Пол"
             />
           </div>
 

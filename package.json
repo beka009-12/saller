@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-api": "orval"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -14,6 +15,7 @@
     "@tanstack/react-query-devtools": "^5.91.3",
     "apexcharts": "^5.3.6",
     "axios": "^1.13.5",
+    "jiti": "1.21.6",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",
     "react": "19.2.3",
@@ -29,8 +31,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ajv": "^8.18.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "orval": "^8.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

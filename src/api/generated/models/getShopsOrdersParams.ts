@@ -5,10 +5,10 @@
  * API for my startup
  * OpenAPI spec version: 1.0.0
  */
-import type { OrderStatus } from './orderStatus';
+import type { GetShopsOrdersStatus } from './getShopsOrdersStatus';
 
 export type GetShopsOrdersParams = {
-  status?: OrderStatus;
-  page?: number;
-  limit?: number;
+status?: GetShopsOrdersStatus;
+page?: number;
+limit?: number;
 };

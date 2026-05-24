@@ -32,6 +32,7 @@ import type {
   GetShopsOrders200,
   GetShopsOrdersParams,
   GetShopsParams,
+  Order,
   UpdateShopInput
 } from '../../models';
 
@@ -568,99 +569,162 @@ export function useGetShopsId<TData = Awaited<ReturnType<typeof getShopsId>>, TE
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+
+
+
+
+
 /**
- * @summary Заказы моего магазина (с фильтрацией по статусу)
+ * @summary Заказы моего магазина
  */
 export const getShopsOrders = (
     params?: GetShopsOrdersParams,
  signal?: AbortSignal
 ) => {
+
+
       return customInstance<GetShopsOrders200>(
-      {url: `/shops/orders`, method: 'GET', params, signal},
+      {url: `/shops/orders`, method: 'GET',
+        params, signal
+    },
       );
     }
 
-export const getGetShopsOrdersQueryKey = (params?: GetShopsOrdersParams) => {
-    return [`/shops/orders`, ...(params ? [params] : [])] as const;
+
+
+
+export const getGetShopsOrdersQueryKey = (params?: GetShopsOrdersParams,) => {
+    return [
+    `/shops/orders`, ...(params ? [params] : [])
+    ] as const;
     }
 
-export const getGetShopsOrdersQueryOptions = <TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = unknown>(params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>> }
+
+export const getGetShopsOrdersQueryOptions = <TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = void>(params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>>, }
 ) => {
+
 const {query: queryOptions} = options ?? {};
-  const queryKey = queryOptions?.queryKey ?? getGetShopsOrdersQueryKey(params);
+
+  const queryKey =  queryOptions?.queryKey ?? getGetShopsOrdersQueryKey(params);
+
+
+
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getShopsOrders>>> = ({ signal }) => getShopsOrders(params, signal);
+
+
+
+
+
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetShopsOrdersQueryResult = NonNullable<Awaited<ReturnType<typeof getShopsOrders>>>
-export type GetShopsOrdersQueryError = unknown
+export type GetShopsOrdersQueryError = void
 
-export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = unknown>(
- params: undefined | GetShopsOrdersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, Awaited<ReturnType<typeof getShopsOrders>>>, 'initialData'> }
+
+export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = void>(
+ params: undefined |  GetShopsOrdersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getShopsOrders>>,
+          TError,
+          Awaited<ReturnType<typeof getShopsOrders>>
+        > , 'initialData'
+      >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = unknown>(
+export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = void>(
  params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, Awaited<ReturnType<typeof getShopsOrders>>>, 'initialData'> }
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getShopsOrders>>,
+          TError,
+          Awaited<ReturnType<typeof getShopsOrders>>
+        > , 'initialData'
+      >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = unknown>(
- params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>> }
+export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = void>(
+ params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Заказы моего магазина
+ */
 
-export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = unknown>(
- params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>> }
+export function useGetShopsOrders<TData = Awaited<ReturnType<typeof getShopsOrders>>, TError = void>(
+ params?: GetShopsOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShopsOrders>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetShopsOrdersQueryOptions(params, options)
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  const queryOptions = getGetShopsOrdersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
+
 
 /**
  * @summary Перевести заказ на следующий статус (PAID→SHIPPED→COMPLETED)
  */
-export const patchShopsOrdersAdvance = (
+export const patchShopsOrdersOrderIdAdvance = (
     orderId: number,
  signal?: AbortSignal
 ) => {
-      return customInstance<void>(
-      {url: `/shops/orders/${orderId}/advance`, method: 'PATCH', signal},
+
+
+      return customInstance<Order>(
+      {url: `/shops/orders/${orderId}/advance`, method: 'PATCH', signal
+    },
       );
     }
 
-export const getPatchShopsOrdersAdvanceMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchShopsOrdersAdvance>>, TError, {orderId: number}, TContext> }
-): UseMutationOptions<Awaited<ReturnType<typeof patchShopsOrdersAdvance>>, TError, {orderId: number}, TContext> => {
-const mutationKey = ['patchShopsOrdersAdvance'];
+
+
+export const getPatchShopsOrdersOrderIdAdvanceMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchShopsOrdersOrderIdAdvance>>, TError,{orderId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof patchShopsOrdersOrderIdAdvance>>, TError,{orderId: number}, TContext> => {
+
+const mutationKey = ['patchShopsOrdersOrderIdAdvance'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey }};
+      : {mutation: { mutationKey, }};
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchShopsOrdersAdvance>>, {orderId: number}> = (props) => {
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchShopsOrdersOrderIdAdvance>>, {orderId: number}> = (props) => {
           const {orderId} = props ?? {};
-          return patchShopsOrdersAdvance(orderId);
+
+          return  patchShopsOrdersOrderIdAdvance(orderId,)
         }
 
-  return  { mutationFn, ...mutationOptions }
-}
 
-export type PatchShopsOrdersAdvanceMutationResult = NonNullable<Awaited<ReturnType<typeof patchShopsOrdersAdvance>>>
-export type PatchShopsOrdersAdvanceMutationError = unknown
 
-export const usePatchShopsOrdersAdvance = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchShopsOrdersAdvance>>, TError, {orderId: number}, TContext> }
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchShopsOrdersOrderIdAdvanceMutationResult = NonNullable<Awaited<ReturnType<typeof patchShopsOrdersOrderIdAdvance>>>
+
+    export type PatchShopsOrdersOrderIdAdvanceMutationError = void
+
+    /**
+ * @summary Перевести заказ на следующий статус (PAID→SHIPPED→COMPLETED)
+ */
+export const usePatchShopsOrdersOrderIdAdvance = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchShopsOrdersOrderIdAdvance>>, TError,{orderId: number}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof patchShopsOrdersAdvance>>,
+        Awaited<ReturnType<typeof patchShopsOrdersOrderIdAdvance>>,
         TError,
         {orderId: number},
         TContext
       > => {
-      return useMutation(getPatchShopsOrdersAdvanceMutationOptions(options), queryClient);
+      return useMutation(getPatchShopsOrdersOrderIdAdvanceMutationOptions(options), queryClient);
     }
-
-

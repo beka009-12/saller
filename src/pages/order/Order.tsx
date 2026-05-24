@@ -1,7 +1,7 @@
 "use client";
 import { FC, useState } from "react";
 import scss from "./Order.module.scss";
-import { useGetShopsOrders, usePatchShopsOrdersAdvance } from "@/src/api/generated/endpoints/shops/shops";
+import { useGetShopsOrders, usePatchShopsOrdersOrderIdAdvance } from "@/src/api/generated/endpoints/shops/shops";
 import type { OrderStatus } from "@/src/api/generated/models";
 import toast from "react-hot-toast";
 
@@ -72,7 +72,7 @@ const Order: FC = () => {
   const { data, isLoading } = useGetShopsOrders(
     filter !== "ALL" ? { status: filter as OrderStatus } : undefined,
   );
-  const { mutate: advance, isPending: advancing } = usePatchShopsOrdersAdvance();
+  const { mutate: advance, isPending: advancing } = usePatchShopsOrdersOrderIdAdvance();
 
   const orders = (data?.orders ?? []) as ShopOrder[];
 

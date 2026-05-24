@@ -28,7 +28,6 @@ import type {
   CreateBannerInput,
   ErrorResponse,
   GetBannerActive200,
-  GetBannerStoreId200,
   PatchBannerIdApprove200,
   PatchBannerIdReject200,
   PatchBannerIdRejectBody,
@@ -133,95 +132,6 @@ export function useGetBannerActive<TData = Awaited<ReturnType<typeof getBannerAc
 }
 
 
-
-
-
-
-/**
- * Возвращает собственный баннер магазина (PENDING или APPROVED) с информацией о слоте оплаты.
- * @summary Получить свой баннер
- */
-export const getBannerStoreId = (
-    storeId: number,
- signal?: AbortSignal
-) => {
-      return customInstance<GetBannerStoreId200>(
-      {url: `/banner/${storeId}`, method: 'GET', signal
-    },
-      );
-    }
-
-
-export const getGetBannerStoreIdQueryKey = (storeId: number) => {
-    return [
-    `/banner/${storeId}`
-    ] as const;
-    }
-
-
-export const getGetBannerStoreIdQueryOptions = <TData = Awaited<ReturnType<typeof getBannerStoreId>>, TError = ErrorResponse>(storeId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBannerStoreId>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetBannerStoreIdQueryKey(storeId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBannerStoreId>>> = ({ signal }) => getBannerStoreId(storeId, signal);
-
-
-
-   return  { queryKey, queryFn, enabled: !!storeId, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBannerStoreId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetBannerStoreIdQueryResult = NonNullable<Awaited<ReturnType<typeof getBannerStoreId>>>
-export type GetBannerStoreIdQueryError = ErrorResponse
-
-
-export function useGetBannerStoreId<TData = Awaited<ReturnType<typeof getBannerStoreId>>, TError = ErrorResponse>(
-  storeId: number,
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBannerStoreId>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBannerStoreId>>,
-          TError,
-          Awaited<ReturnType<typeof getBannerStoreId>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBannerStoreId<TData = Awaited<ReturnType<typeof getBannerStoreId>>, TError = ErrorResponse>(
-  storeId: number,
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBannerStoreId>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBannerStoreId>>,
-          TError,
-          Awaited<ReturnType<typeof getBannerStoreId>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBannerStoreId<TData = Awaited<ReturnType<typeof getBannerStoreId>>, TError = ErrorResponse>(
-  storeId: number,
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBannerStoreId>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Получить свой баннер
- */
-
-export function useGetBannerStoreId<TData = Awaited<ReturnType<typeof getBannerStoreId>>, TError = ErrorResponse>(
-  storeId: number,
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBannerStoreId>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetBannerStoreIdQueryOptions(storeId, options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
 
 
 

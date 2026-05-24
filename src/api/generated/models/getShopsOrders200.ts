@@ -8,8 +8,8 @@
 import type { Order } from './order';
 
 export type GetShopsOrders200 = {
-  orders: Order[];
-  total: number;
-  page: number;
-  limit: number;
+  orders?: Order[];
+  total?: number;
+  page?: number;
+  limit?: number;
 };

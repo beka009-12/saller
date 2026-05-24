@@ -1,556 +1,314 @@
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap");
-
-$bg: #ffffff;
-$border: #e8e8e4;
-$text: #111110;
-$muted: #8a8a86;
-$accent: #fb4a1e;
-$radius-sm: 6px;
-$radius-md: 10px;
-$transition: 0.14s ease;
-
-.header {
-  position: sticky;
+// ── Mobile topbar (hidden on desktop) ─────────────────────────────────────────
+.topbar {
+  display: none;
+  position: fixed;
   top: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid transparent;
-  transition:
-    border-color $transition,
-    box-shadow $transition;
-  font-family: "Geist", sans-serif;
-
-  &.scrolled {
-    border-bottom-color: $border;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-  }
-}
-
-.inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  left: 0;
+  right: 0;
   height: 56px;
-  gap: 24px;
-}
-
-.logo {
-  display: flex;
+  z-index: 80;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border-strong);
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  flex-shrink: 0;
-  user-select: none;
+  padding: 0 16px;
+  justify-content: space-between;
 
-  &:hover .logoMark {
-    background: (#111110, 5%);
+  @media (max-width: 900px) {
+    display: flex;
   }
 }
 
-.logoMark {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: $text;
-  color: #fff;
+.burger {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background $transition;
-  flex-shrink: 0;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  color: var(--text-1);
+  transition: color 0.15s, background 0.15s;
+  &:hover { background: var(--bg-4); color: var(--text-0); }
 }
 
-.logoText {
-  font-size: 17px;
-  font-weight: 600;
-  color: $text;
-  letter-spacing: -0.3px;
-
-  em {
-    font-style: normal;
-    color: $accent;
-  }
-}
-
-.left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex: 1;
-  min-width: 0;
-}
-
-.right {
+.topLogo {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--text-0);
+  cursor: pointer;
+}
+
+.logoZap { color: var(--accent); }
+
+.topAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ── Desktop sidebar ────────────────────────────────────────────────────────────
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  z-index: 70;
+  background: var(--bg-2);
+  border-right: 1px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.sideInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 14px 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+// ── Logo ──────────────────────────────────────────────────────────────────────
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 4px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logoIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
   flex-shrink: 0;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.logoText {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: var(--text-0);
+}
+
+// ── Store pill ─────────────────────────────────────────────────────────────────
+.storePill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  margin-bottom: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.storeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2.5s infinite;
+}
+
+.dotOff {
+  background: var(--text-2);
+  box-shadow: none;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+.navLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-2);
+  padding: 0 6px 8px;
 }
 
 .nav {
+  flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 2px;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: $radius-sm;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
   background: transparent;
-  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: $muted;
-  cursor: pointer;
-  transition:
-    background $transition,
-    color $transition;
-  white-space: nowrap;
-
-  svg {
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: #f4f4f2;
-    color: $text;
-  }
-}
-
-.storePill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border: 1px solid $border;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  color: $muted;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.storeIcon {
-  color: $muted;
-  flex-shrink: 0;
-}
-
-.iconBtn {
+  color: var(--text-1);
+  transition: background 0.14s, color 0.14s;
+  text-align: left;
+  width: 100%;
   position: relative;
-  width: 36px;
-  height: 36px;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  background: $bg;
-  color: $muted;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    background $transition,
-    border-color $transition,
-    color $transition;
-  flex-shrink: 0;
 
   &:hover {
-    background: #f4f4f2;
-    border-color: #ccc;
-    color: $text;
+    background: var(--bg-3);
+    color: var(--text-0);
   }
 
   &.active {
-    background: $text;
-    border-color: $text;
-    color: #fff;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--border-accent);
+    .navIcon { color: var(--accent); }
   }
 }
 
-.dot {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 17px;
-  height: 17px;
-  background: $accent;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-  border: 2px solid $bg;
-}
-
-.userBtn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px 4px 4px;
-  border: 1px solid $border;
-  border-radius: $radius-md;
-  background: $bg;
-  cursor: pointer;
-  transition:
-    background $transition,
-    border-color $transition;
-  font-family: inherit;
-
-  &:hover {
-    background: #f4f4f2;
-    border-color: #ccc;
-  }
-
-  &.active {
-    border-color: $text;
-  }
-}
-
-.avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  background: #f0ede8;
-  color: $muted;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+.navIcon {
   flex-shrink: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.userName {
-  font-size: 13px;
-  font-weight: 500;
-  color: $text;
-  white-space: nowrap;
+  color: var(--text-2);
+  transition: color 0.14s;
 }
 
 .chevron {
-  color: $muted;
-  transition: transform 0.2s ease;
+  margin-left: auto;
   flex-shrink: 0;
-
-  &.open {
-    transform: rotate(180deg);
-  }
 }
 
-.popoverAnchor {
-  position: relative;
-}
-
-.veil {
-  position: fixed;
-  inset: 0;
-  z-index: 49;
-}
-
-.popover {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 280px;
-  background: $bg;
-  border: 1px solid $border;
-  border-radius: 12px;
-  overflow: hidden;
-  z-index: 50;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  animation: popIn 0.15s ease;
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.popoverHead {
+// ── Bottom block ───────────────────────────────────────────────────────────────
+.bottomBlock {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  border-bottom: 1px solid $border;
-
-  span:first-child {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: $muted;
-  }
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-strong);
+  margin-top: auto;
 }
 
-.unreadBadge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: #fff0ec;
-  color: $accent;
-}
-
-.notifList {
-  display: flex;
-  flex-direction: column;
-}
-
-.notifRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid $border;
-  cursor: pointer;
-  transition: background $transition;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background: #fafaf8;
-  }
-
-  &.unread {
-    background: #fdf8f7;
-  }
-  &.unread:hover {
-    background: #faf2f0;
-  }
-}
-
-.notifIcon {
-  width: 28px;
-  height: 28px;
-  border-radius: $radius-sm;
-  background: #f4f4f2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: $muted;
-
-  .unread & {
-    background: #fff0ec;
-    color: $accent;
-  }
-}
-
-.notifText {
+.profileBtn {
   flex: 1;
   min-width: 0;
-
-  p {
-    margin: 0 0 3px;
-    font-size: 13px;
-    font-weight: 500;
-    color: $text;
-    line-height: 1.4;
-  }
-
-  time {
-    font-size: 11px;
-    color: $muted;
-  }
-}
-
-.unreadDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: $accent;
-  flex-shrink: 0;
-  margin-top: 5px;
-}
-
-.userHead {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border-bottom: 1px solid $border;
-  background: #fafaf8;
+  gap: 9px;
+  padding: 7px 8px;
+  background: transparent;
+  border-radius: var(--r-sm);
+  transition: background 0.14s;
+  text-align: left;
+
+  &:hover { background: var(--bg-3); }
 }
 
-.avatarLg {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #f0ede8;
-  color: $muted;
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--accent-dim);
+  border: 1px solid var(--border-accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   flex-shrink: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 }
 
-.userNameLg {
-  font-size: 14px;
+.userInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.userName {
+  font-size: 12px;
   font-weight: 600;
-  color: $text;
-  margin: 0 0 2px;
+  color: var(--text-0);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .userEmail {
-  font-size: 12px;
-  color: $muted;
-  margin: 0;
+  font-size: 10px;
+  color: var(--text-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.menuList {
-  padding: 6px;
-}
-
-.menuRow {
+.logoutBtn {
+  width: 32px;
+  height: 32px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 10px;
-  border: none;
-  border-radius: $radius-sm;
-  background: transparent;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: $text;
-  text-decoration: none;
-  cursor: pointer;
-  width: 100%;
-  transition:
-    background $transition,
-    color $transition;
-
-  svg {
-    color: $muted;
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: #f4f4f2;
-  }
-
-  &.danger {
-    color: #c0392b;
-    svg {
-      color: #c0392b;
-    }
-    &:hover {
-      background: #fff0ee;
-    }
-  }
-}
-
-.loginBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border: 1px solid $text;
-  border-radius: 20px;
-  background: $text;
-  color: #fff;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity $transition;
-
-  &:hover {
-    opacity: 0.82;
-  }
-}
-
-.skeleton {
-  width: 110px;
-  height: 36px;
-  border-radius: $radius-md;
-  background: linear-gradient(90deg, #f0f0ee 25%, #e6e6e4 50%, #f0f0ee 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-.burger {
-  display: none;
-  width: 36px;
-  height: 36px;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  background: $bg;
-  color: $muted;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition:
-    background $transition,
-    color $transition;
+  background: transparent;
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  transition: background 0.14s, color 0.14s;
   flex-shrink: 0;
 
-  &:hover {
-    background: #f4f4f2;
-    color: $text;
-  }
+  &:hover { background: var(--red-dim); color: var(--red); }
 }
 
-.drawerBackdrop {
+// ── Mobile drawer ──────────────────────────────────────────────────────────────
+.backdrop {
   position: fixed;
   inset: 0;
-  z-index: 90;
-  background: rgba(0, 0, 0, 0.32);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.22s ease;
-  backdrop-filter: blur(2px);
+  z-index: 88;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
 
-  &.drawerOpen {
-    opacity: 1;
-    pointer-events: auto;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .drawer {
@@ -559,18 +317,15 @@ $transition: 0.14s ease;
   left: 0;
   bottom: 0;
   width: 260px;
-  background: $bg;
-  z-index: 91;
+  z-index: 89;
+  background: var(--bg-2);
+  border-right: 1px solid var(--border-strong);
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-y: auto;
-  border-right: 1px solid $border;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &.drawerOpen {
-    transform: translateX(0);
-  }
+  &.drawerOpen { transform: translateX(0); }
 }
 
 .drawerHead {
@@ -578,158 +333,86 @@ $transition: 0.14s ease;
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid $border;
+  border-bottom: 1px solid var(--border-strong);
 }
 
-.drawerClose {
+.closeBtn {
   width: 32px;
   height: 32px;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  background: transparent;
-  color: $muted;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background $transition;
-
-  &:hover {
-    background: #f4f4f2;
-    color: $text;
-  }
+  background: var(--bg-3);
+  border-radius: var(--r-sm);
+  color: var(--text-1);
+  &:hover { background: var(--bg-4); }
 }
 
 .drawerStore {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 12px 12px 0;
-  padding: 8px 10px;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
+  gap: 8px;
+  margin: 12px 16px 0;
+  padding: 8px 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
   font-size: 12px;
-  font-weight: 500;
-  color: $muted;
-  background: #fafaf8;
+  color: var(--text-1);
 }
 
 .drawerNav {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 12px;
-  flex: 1;
 }
 
 .drawerNavItem {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border: none;
-  border-radius: $radius-sm;
+  padding: 11px 12px;
+  border-radius: var(--r-sm);
   background: transparent;
-  font-family: inherit;
   font-size: 14px;
   font-weight: 500;
-  color: $muted;
-  cursor: pointer;
-  transition:
-    background $transition,
-    color $transition;
+  color: var(--text-1);
+  transition: background 0.14s, color 0.14s;
   text-align: left;
 
-  svg {
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: #f4f4f2;
-    color: $text;
-  }
+  &:hover { background: var(--bg-3); color: var(--text-0); }
+  &.active { background: var(--accent-dim); color: var(--accent); }
 }
 
 .drawerFooter {
   padding: 12px;
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawerUser {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
 }
 
 .drawerLogout {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
-  border: none;
-  border-radius: $radius-sm;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
   background: transparent;
-  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: #c0392b;
-  cursor: pointer;
+  color: var(--red);
   width: 100%;
-  transition: background $transition;
+  transition: background 0.14s;
 
-  svg {
-    flex-shrink: 0;
-  }
-
-  &:hover {
-    background: #fff0ee;
-  }
-}
-
-@media (max-width: 1024px) {
-  .storePill {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .inner {
-    height: 52px;
-  }
-
-  .nav {
-    display: none;
-  }
-
-  .burger {
-    display: flex;
-  }
-
-  .left {
-    gap: 10px;
-  }
-
-  .right {
-    gap: 4px;
-  }
-
-  .userName {
-    display: none;
-  }
-
-  .userBtn {
-    padding: 4px;
-    gap: 0;
-    .chevron {
-      display: none;
-    }
-  }
-
-  .popover {
-    width: calc(100vw - 24px);
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    max-width: 360px;
-  }
-}
-
-@media (max-width: 360px) {
-  .logoText {
-    display: none;
-  }
+  &:hover { background: var(--red-dim); }
 }

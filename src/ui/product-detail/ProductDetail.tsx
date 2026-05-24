@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useGetProductById } from "@/src/api/product";
+import { useGetCommodityProductOwnerId } from "@/src/api/generated/endpoints/product/product";
 import scss from "./ProductDetail.module.scss";
 import { useState, useEffect, useRef } from "react";
 import UpdateModal from "../card-buttons/updateModal/UpdateModal";
@@ -13,7 +13,7 @@ interface ProductDetailProps {
 
 const ProductDetail = ({ id }: ProductDetailProps) => {
   const router = useRouter();
-  const { data, isLoading } = useGetProductById(id);
+  const { data, isLoading } = useGetCommodityProductOwnerId(id);
 
   // Достаем product из даты (зависит от того, как возвращает ваш хук)
   const product = data?.product;
@@ -57,9 +57,9 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
         <div className={scss.content}>
           {/* Левая колонка: Галерея */}
           <div className={scss.gallery}>
-            {product.images?.length > 1 && (
+            {((product as any).images?.length ?? 0) > 1 && (
               <div className={scss.thumbs}>
-                {product.images.map((img: string, i: number) => (
+                {(product as any).images.map((img: string, i: number) => (
                   <img
                     key={i}
                     src={img}
@@ -73,7 +73,7 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
               </div>
             )}
             <img
-              src={product.images?.[selectedImageIndex] || "/placeholder.png"}
+              src={(product as any).images?.[selectedImageIndex] || "/placeholder.png"}
               alt={product.title}
               className={scss.mainImage}
             />
@@ -203,10 +203,10 @@ const ProductDetail = ({ id }: ProductDetailProps) => {
               )}
             </div>
 
-            {product.archivedAt && (
+            {(product as any).archivedAt && (
               <div className={scss.archived}>
                 Архивировано:{" "}
-                {new Date(product.archivedAt).toLocaleDateString("ru-RU")}
+                {new Date((product as any).archivedAt).toLocaleDateString("ru-RU")}
               </div>
             )}
           </div>

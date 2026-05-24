@@ -1,6 +1,6 @@
 "use client";
 import { FC, useState } from "react";
-import { useGetProductById, useUpdateProduct } from "@/src/api/product";
+import { useGetCommodityProductOwnerId, usePatchCommodityProductUpdateId } from "@/src/api/generated/endpoints/product/product";
 import scss from "./UpdateModal.module.scss";
 
 interface EditModalProps {
@@ -9,14 +9,14 @@ interface EditModalProps {
 }
 
 const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
-  const { data, isLoading } = useGetProductById(productId);
-  const { mutate: updateProduct, isPending } = useUpdateProduct();
+  const { data, isLoading } = useGetCommodityProductOwnerId(productId);
+  const { mutate: updateProduct, isPending } = usePatchCommodityProductUpdateId();
   const [previews, setPreviews] = useState<string[]>([]);
 
   if (isLoading) return null;
   if (!data) return null;
 
-  const product = data.product;
+  const product = data.product!;
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -33,25 +33,26 @@ const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
       {
         id: productId,
         data: {
+          categoryId: product?.categoryId ?? 0,
           title: formData.get("title") as string,
           description: formData.get("description") as string,
           price: Number(formData.get("price")),
           newPrice: Number(formData.get("newPrice")),
           stockCount: Number(formData.get("stockCount")),
           brandName: (formData.get("brandName") as string) || undefined,
-          season: (formData.get("season") as string) || undefined,
+          season: ((formData.get("season") as string) || "ALL_SEASON") as any,
           sizes:
-            (formData.get("size") as string)
+            ((formData.get("size") as string)
               ?.split(",")
               .map((s) => s.trim())
-              .filter(Boolean) || undefined,
+              .filter(Boolean)) || [],
           colors:
-            (formData.get("color") as string)
+            ((formData.get("color") as string)
               ?.split(",")
               .map((s) => s.trim())
-              .filter(Boolean) || undefined,
+              .filter(Boolean)) || [],
           material: (formData.get("material") as string) || undefined,
-          gender: (formData.get("gender") as string) || undefined,
+          gender: ((formData.get("gender") as string) || "UNISEX") as any,
         },
       },
       { onSuccess: onClose },
@@ -72,8 +73,8 @@ const UpdateModal: FC<EditModalProps> = ({ productId, onClose }) => {
           <div className={scss.field}>
             <label>Фото</label>
             <div className={scss.images}>
-              {(previews.length > 0 ? previews : product.images).map(
-                (img, i) => (
+              {(previews.length > 0 ? previews : ((product as any)?.images ?? [])).map(
+                (img: string, i: number) => (
                   <img
                     key={i}
                     src={img}

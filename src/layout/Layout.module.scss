@@ -1,11 +1,19 @@
 .Layout {
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  min-height: 100vh;
+  background: var(--bg-1);
 
   main {
     flex: 1;
-    padding: 1rem 0;
+    min-width: 0;
+    margin-left: var(--sidebar-w);
+    transition: margin-left 0.3s ease;
+  }
+}
+
+@media (max-width: 900px) {
+  .Layout main {
+    margin-left: 0;
+    padding-top: 56px;
   }
 }

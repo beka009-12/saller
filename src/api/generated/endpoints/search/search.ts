@@ -22,7 +22,9 @@ import type {
 
 import type {
   GetSearchProductsParams,
-  ProductListResponse
+  GetSearchSuggestions200,
+  GetSearchSuggestionsParams,
+  SearchResponse
 } from '../../models';
 
 import { customInstance } from '../../../index';
@@ -31,7 +33,7 @@ import { customInstance } from '../../../index';
 
 
 /**
- * @summary Поиск товаров
+ * @summary Поиск товаров (fuzzy по title, description, brandName)
  */
 export const getSearchProducts = (
     params?: GetSearchProductsParams,
@@ -39,7 +41,7 @@ export const getSearchProducts = (
 ) => {
 
 
-      return customInstance<ProductListResponse>(
+      return customInstance<SearchResponse>(
       {url: `/search/products`, method: 'GET',
         params, signal
     },
@@ -56,7 +58,7 @@ export const getGetSearchProductsQueryKey = (params?: GetSearchProductsParams,) 
     }
 
 
-export const getGetSearchProductsQueryOptions = <TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = unknown>(params?: GetSearchProductsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchProducts>>, TError, TData>>, }
+export const getGetSearchProductsQueryOptions = <TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = void>(params?: GetSearchProductsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchProducts>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -75,10 +77,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type GetSearchProductsQueryResult = NonNullable<Awaited<ReturnType<typeof getSearchProducts>>>
-export type GetSearchProductsQueryError = unknown
+export type GetSearchProductsQueryError = void
 
 
-export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = unknown>(
+export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = void>(
  params: undefined |  GetSearchProductsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchProducts>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSearchProducts>>,
@@ -88,7 +90,7 @@ export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearch
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = unknown>(
+export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = void>(
  params?: GetSearchProductsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchProducts>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSearchProducts>>,
@@ -98,20 +100,113 @@ export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearch
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = unknown>(
+export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = void>(
  params?: GetSearchProductsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchProducts>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Поиск товаров
+ * @summary Поиск товаров (fuzzy по title, description, brandName)
  */
 
-export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = unknown>(
+export function useGetSearchProducts<TData = Awaited<ReturnType<typeof getSearchProducts>>, TError = void>(
  params?: GetSearchProductsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchProducts>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSearchProductsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * @summary Автодополнение поиска (title и brandName)
+ */
+export const getSearchSuggestions = (
+    params: GetSearchSuggestionsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetSearchSuggestions200>(
+      {url: `/search/suggestions`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getGetSearchSuggestionsQueryKey = (params?: GetSearchSuggestionsParams,) => {
+    return [
+    `/search/suggestions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetSearchSuggestionsQueryOptions = <TData = Awaited<ReturnType<typeof getSearchSuggestions>>, TError = unknown>(params: GetSearchSuggestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSuggestions>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSearchSuggestionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSearchSuggestions>>> = ({ signal }) => getSearchSuggestions(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSearchSuggestions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSearchSuggestionsQueryResult = NonNullable<Awaited<ReturnType<typeof getSearchSuggestions>>>
+export type GetSearchSuggestionsQueryError = unknown
+
+
+export function useGetSearchSuggestions<TData = Awaited<ReturnType<typeof getSearchSuggestions>>, TError = unknown>(
+ params: GetSearchSuggestionsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSuggestions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSearchSuggestions>>,
+          TError,
+          Awaited<ReturnType<typeof getSearchSuggestions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSearchSuggestions<TData = Awaited<ReturnType<typeof getSearchSuggestions>>, TError = unknown>(
+ params: GetSearchSuggestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSuggestions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSearchSuggestions>>,
+          TError,
+          Awaited<ReturnType<typeof getSearchSuggestions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSearchSuggestions<TData = Awaited<ReturnType<typeof getSearchSuggestions>>, TError = unknown>(
+ params: GetSearchSuggestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSuggestions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Автодополнение поиска (title и brandName)
+ */
+
+export function useGetSearchSuggestions<TData = Awaited<ReturnType<typeof getSearchSuggestions>>, TError = unknown>(
+ params: GetSearchSuggestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSuggestions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSearchSuggestionsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

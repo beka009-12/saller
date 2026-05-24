@@ -2,11 +2,11 @@
 import { FC, useState } from "react";
 import scss from "./MyProducts.module.scss";
 import UpdateModal from "@/src/ui/card-buttons/updateModal/UpdateModal";
-import { useGetNestShopCommodityProducts } from "@/src/api/generated/endpoints/product/product";
 import Card from "@/src/ui/card/Card";
+import { useGetCommodityMyProducts } from "@/src/api/generated/endpoints/product/product";
 
 const MyProducts: FC = () => {
-  const { data } = useGetNestShopCommodityProducts();
+  const { data } = useGetCommodityMyProducts();
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
   return (

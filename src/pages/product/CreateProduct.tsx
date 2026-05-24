@@ -1,8 +1,8 @@
 "use client";
 import { type FC, useState, useRef, useEffect, useMemo } from "react";
 import scss from "./CreateProduct.module.scss";
-import { useGetCategories } from "@/src/api/category";
-import { useCreateProduct } from "@/src/api/product";
+import { useGetCategoryCategoriesTree } from "@/src/api/generated/endpoints/category/category";
+import { usePostCommodityCreateProduct } from "@/src/api/generated/endpoints/product/product";
 import toast from "react-hot-toast";
 
 type Gender = "MALE" | "FEMALE" | "UNISEX";
@@ -426,9 +426,9 @@ const CreateProduct: FC = () => {
     isActive: true,
   });
 
-  const { data: categories = [], isLoading: isLoadingCats } =
-    useGetCategories();
-  const { mutate: createProduct, isPending } = useCreateProduct();
+  const { data: categoriesData, isLoading: isLoadingCats } = useGetCategoryCategoriesTree();
+  const categories = categoriesData?.categories ?? [];
+  const { mutate: createProduct, isPending } = usePostCommodityCreateProduct();
 
   const update = (key: keyof FormState, value: unknown) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -457,32 +457,21 @@ const CreateProduct: FC = () => {
       return;
     }
 
-    const formData = new FormData();
-
-    formData.append("categoryId", String(form.categoryId));
-    formData.append("title", form.title.trim());
-    formData.append("description", form.description.trim());
-    formData.append("price", form.price);
-    formData.append("isActive", String(form.isActive));
-
-    if (form.brandName?.trim())
-      formData.append("brandName", form.brandName.trim());
-    if (form.newPrice?.trim()) formData.append("newPrice", form.newPrice);
-    if (form.stockCount?.trim()) formData.append("stockCount", form.stockCount);
-
-    // ✅ Правильная отправка массивов
-    form.sizes.forEach((size) => formData.append("sizes[]", size)); // ← важно: sizes[]
-    form.colors.forEach((color) => formData.append("colors[]", color)); // ← важно: colors[]
-
-    if (form.material?.trim())
-      formData.append("material", form.material.trim());
-    if (form.gender) formData.append("gender", form.gender);
-    if (form.season) formData.append("season", form.season);
-
-    // Изображения
-    form.images.forEach((image) => formData.append("images", image));
-
-    createProduct(formData, {
+    createProduct({ data: {
+      categoryId: form.categoryId!,
+      title: form.title.trim(),
+      description: form.description.trim(),
+      price: Number(form.price),
+      brandName: form.brandName?.trim() || undefined,
+      newPrice: form.newPrice ? Number(form.newPrice) : undefined,
+      stockCount: form.stockCount ? Number(form.stockCount) : undefined,
+      sizes: form.sizes,
+      colors: form.colors,
+      material: form.material?.trim() || undefined,
+      gender: (form.gender || "UNISEX") as any,
+      season: (form.season || "ALL_SEASON") as any,
+      images: form.images as any,
+    }}, {
       onSuccess: () => {
         toast.success("Товар успешно создан!");
         // Сброс формы

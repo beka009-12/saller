@@ -1,4 +1,4 @@
-import Profile from "@/src/pages/ProfilePage";
+import Profile from "@/src/pages/profile/Profile";
 
 const page = () => {
   return <Profile />;

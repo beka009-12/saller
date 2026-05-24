@@ -5,18 +5,43 @@
  * API for my startup
  * OpenAPI spec version: 1.0.0
  */
+import type { GetSearchProductsGender } from './getSearchProductsGender';
+import type { GetSearchProductsSeason } from './getSearchProductsSeason';
+import type { GetSearchProductsSortBy } from './getSearchProductsSortBy';
+import type { GetSearchProductsSortOrder } from './getSearchProductsSortOrder';
 
 export type GetSearchProductsParams = {
 /**
- * Поисковый запрос (fuzzy поиск по title, brandName)
+ * Fuzzy-поиск по title, description, brandName
  */
 search?: string;
 page?: number;
+/**
+ * @maximum 100
+ */
 limit?: number;
+/**
+ * Включает все вложенные категории
+ */
 categoryId?: number;
 minPrice?: number;
 maxPrice?: number;
 brandName?: string;
 storeId?: number;
+/**
+ * true — только товары в наличии
+ */
 inStock?: boolean;
+gender?: GetSearchProductsGender;
+season?: GetSearchProductsSeason;
+/**
+ * Размеры через запятую, например "S,M,L"
+ */
+sizes?: string;
+/**
+ * Цвета через запятую, например "red,black"
+ */
+colors?: string;
+sortBy?: GetSearchProductsSortBy;
+sortOrder?: GetSearchProductsSortOrder;
 };

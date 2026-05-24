@@ -10,18 +10,8 @@ export interface Store {
   id?: number;
   name?: string;
   /** @nullable */
-  description?: string | null;
-  /** @nullable */
   logo?: string | null;
   isVerified?: boolean;
   /** @nullable */
   rating?: number | null;
-  /** @nullable */
-  address?: string | null;
-  /** @nullable */
-  region?: string | null;
-  isActive?: boolean;
-  ownerId?: number;
-  createdAt?: string;
-  updatedAt?: string;
 }

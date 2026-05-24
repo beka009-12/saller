@@ -4,38 +4,56 @@ import Link from "next/link";
 import scss from "./Card.module.scss";
 import CardButtons from "@/src/ui/card-buttons/CardButtons";
 import { Product } from "@/src/api/generated/models/product";
+import { useDeleteCommodityProductDeleteId } from "@/src/api/generated/endpoints/product/product";
+import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 interface CardProps {
   product: Product;
   onEdit: (id: number) => void;
-  onDelete?: (id: number) => void; // Можно передать сверху для гибкости
 }
 
 const Card: FC<CardProps> = ({ product, onEdit }) => {
+  const { mutate: deleteProduct } = useDeleteCommodityProductDeleteId();
+  const queryClient = useQueryClient();
+
+  const handleDelete = (id: number) => {
+    if (!confirm("Удалить товар?")) return;
+    deleteProduct(
+      { id },
+      {
+        onSuccess: () => {
+          toast.success("Товар удалён");
+          queryClient.invalidateQueries({ queryKey: [`/commodity/my-products`] });
+        },
+        onError: () => toast.error("Ошибка при удалении"),
+      },
+    );
+  };
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el || (product.images ?? []).length <= 1) return;
+    if (!el || ((product as any).images ?? []).length <= 1) return;
     const handleScroll = () => {
       const index = Math.round(el.scrollLeft / el.offsetWidth);
       setActiveIndex(index);
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
     return () => el.removeEventListener("scroll", handleScroll);
-  }, [product.images]);
+  }, [(product as any).images]);
 
   const price = Number(product.price ?? 0);
   const stockCount = product.stockCount ?? 0;
-  const images = product.images ?? [];
+  const images = (product as any).images ?? [];
 
   return (
     <div className={scss.adminCard}>
       <div className={scss.preview}>
         <div className={scss.imageContainer} ref={scrollRef}>
           {images.length > 0 ? (
-            images.map((img, i) => (
+            images.map((img: string, i: number) => (
               <img key={i} src={img} alt="" className={scss.img} />
             ))
           ) : (
@@ -86,7 +104,7 @@ const Card: FC<CardProps> = ({ product, onEdit }) => {
           <CardButtons
             productId={product.id!}
             onEdit={onEdit}
-            onDelete={() => {}} // Логика удаления
+            onDelete={handleDelete}
           />
         </div>
       </div>

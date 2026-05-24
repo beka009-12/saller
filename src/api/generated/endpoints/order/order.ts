@@ -25,10 +25,11 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AddToCartInput,
-  CartItem,
-  DeleteOrderDeleteAllCartUserId200,
-  DeleteOrderDeleteByIdProductId200
+  CreateOrderInput,
+  GetOrderMyOrdersParams,
+  Order,
+  PostOrderCancelOrderId200,
+  PostOrderCreateOrder201
 } from '../../models';
 
 import { customInstance } from '../../../index';
@@ -37,27 +38,31 @@ import { customInstance } from '../../../index';
 
 
 /**
- * @summary Добавить товар в корзину
+ * Создаёт заказы по каждому магазину из корзины в одной транзакции.
+Корзина должна быть непустой, адрес доставки — существовать.
+После создания корзина очищается, остатки товаров уменьшаются.
+
+ * @summary Создать заказ из корзины
  */
 export const postOrderCreateOrder = (
-    addToCartInput: AddToCartInput,
+    createOrderInput: CreateOrderInput,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<CartItem>(
+      return customInstance<PostOrderCreateOrder201>(
       {url: `/order/create-order`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: addToCartInput, signal
+      data: createOrderInput, signal
     },
       );
     }
 
 
 
-export const getPostOrderCreateOrderMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postOrderCreateOrder>>, TError,{data: AddToCartInput}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof postOrderCreateOrder>>, TError,{data: AddToCartInput}, TContext> => {
+export const getPostOrderCreateOrderMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postOrderCreateOrder>>, TError,{data: CreateOrderInput}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postOrderCreateOrder>>, TError,{data: CreateOrderInput}, TContext> => {
 
 const mutationKey = ['postOrderCreateOrder'];
 const {mutation: mutationOptions} = options ?
@@ -69,7 +74,7 @@ const {mutation: mutationOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postOrderCreateOrder>>, {data: AddToCartInput}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postOrderCreateOrder>>, {data: CreateOrderInput}> = (props) => {
           const {data} = props ?? {};
 
           return  postOrderCreateOrder(data,)
@@ -83,33 +88,34 @@ const {mutation: mutationOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostOrderCreateOrderMutationResult = NonNullable<Awaited<ReturnType<typeof postOrderCreateOrder>>>
-    export type PostOrderCreateOrderMutationBody = AddToCartInput
-    export type PostOrderCreateOrderMutationError = unknown
+    export type PostOrderCreateOrderMutationBody = CreateOrderInput
+    export type PostOrderCreateOrderMutationError = void
 
     /**
- * @summary Добавить товар в корзину
+ * @summary Создать заказ из корзины
  */
-export const usePostOrderCreateOrder = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postOrderCreateOrder>>, TError,{data: AddToCartInput}, TContext>, }
+export const usePostOrderCreateOrder = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postOrderCreateOrder>>, TError,{data: CreateOrderInput}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postOrderCreateOrder>>,
         TError,
-        {data: AddToCartInput},
+        {data: CreateOrderInput},
         TContext
       > => {
       return useMutation(getPostOrderCreateOrderMutationOptions(options), queryClient);
     }
     /**
- * @summary Получить корзину пользователя
+ * @summary Мои заказы
  */
-export const getOrderCartUserId = (
-    userId: number,
+export const getOrderMyOrders = (
+    params?: GetOrderMyOrdersParams,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<CartItem[]>(
-      {url: `/order/cart/${userId}`, method: 'GET', signal
+      return customInstance<Order[]>(
+      {url: `/order/my-orders`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -117,69 +123,69 @@ export const getOrderCartUserId = (
 
 
 
-export const getGetOrderCartUserIdQueryKey = (userId: number,) => {
+export const getGetOrderMyOrdersQueryKey = (params?: GetOrderMyOrdersParams,) => {
     return [
-    `/order/cart/${userId}`
+    `/order/my-orders`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetOrderCartUserIdQueryOptions = <TData = Awaited<ReturnType<typeof getOrderCartUserId>>, TError = unknown>(userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderCartUserId>>, TError, TData>>, }
+export const getGetOrderMyOrdersQueryOptions = <TData = Awaited<ReturnType<typeof getOrderMyOrders>>, TError = void>(params?: GetOrderMyOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderMyOrders>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetOrderCartUserIdQueryKey(userId);
+  const queryKey =  queryOptions?.queryKey ?? getGetOrderMyOrdersQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrderCartUserId>>> = ({ signal }) => getOrderCartUserId(userId, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrderMyOrders>>> = ({ signal }) => getOrderMyOrders(params, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOrderCartUserId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOrderMyOrders>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetOrderCartUserIdQueryResult = NonNullable<Awaited<ReturnType<typeof getOrderCartUserId>>>
-export type GetOrderCartUserIdQueryError = unknown
+export type GetOrderMyOrdersQueryResult = NonNullable<Awaited<ReturnType<typeof getOrderMyOrders>>>
+export type GetOrderMyOrdersQueryError = void
 
 
-export function useGetOrderCartUserId<TData = Awaited<ReturnType<typeof getOrderCartUserId>>, TError = unknown>(
- userId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderCartUserId>>, TError, TData>> & Pick<
+export function useGetOrderMyOrders<TData = Awaited<ReturnType<typeof getOrderMyOrders>>, TError = void>(
+ params: undefined |  GetOrderMyOrdersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderMyOrders>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getOrderCartUserId>>,
+          Awaited<ReturnType<typeof getOrderMyOrders>>,
           TError,
-          Awaited<ReturnType<typeof getOrderCartUserId>>
+          Awaited<ReturnType<typeof getOrderMyOrders>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOrderCartUserId<TData = Awaited<ReturnType<typeof getOrderCartUserId>>, TError = unknown>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderCartUserId>>, TError, TData>> & Pick<
+export function useGetOrderMyOrders<TData = Awaited<ReturnType<typeof getOrderMyOrders>>, TError = void>(
+ params?: GetOrderMyOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderMyOrders>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getOrderCartUserId>>,
+          Awaited<ReturnType<typeof getOrderMyOrders>>,
           TError,
-          Awaited<ReturnType<typeof getOrderCartUserId>>
+          Awaited<ReturnType<typeof getOrderMyOrders>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOrderCartUserId<TData = Awaited<ReturnType<typeof getOrderCartUserId>>, TError = unknown>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderCartUserId>>, TError, TData>>, }
+export function useGetOrderMyOrders<TData = Awaited<ReturnType<typeof getOrderMyOrders>>, TError = void>(
+ params?: GetOrderMyOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderMyOrders>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Получить корзину пользователя
+ * @summary Мои заказы
  */
 
-export function useGetOrderCartUserId<TData = Awaited<ReturnType<typeof getOrderCartUserId>>, TError = unknown>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderCartUserId>>, TError, TData>>, }
+export function useGetOrderMyOrders<TData = Awaited<ReturnType<typeof getOrderMyOrders>>, TError = void>(
+ params?: GetOrderMyOrdersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderMyOrders>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetOrderCartUserIdQueryOptions(userId,options)
+  const queryOptions = getGetOrderMyOrdersQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -192,27 +198,120 @@ export function useGetOrderCartUserId<TData = Awaited<ReturnType<typeof getOrder
 
 
 /**
- * @summary Очистить корзину
+ * @summary Получить заказ по ID
  */
-export const deleteOrderDeleteAllCartUserId = (
-    userId: number,
+export const getOrderOrderId = (
+    orderId: number,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<DeleteOrderDeleteAllCartUserId200>(
-      {url: `/order/delete-all-cart/${userId}`, method: 'DELETE', signal
+      return customInstance<Order>(
+      {url: `/order/${orderId}`, method: 'GET', signal
     },
       );
     }
 
 
 
-export const getDeleteOrderDeleteAllCartUserIdMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOrderDeleteAllCartUserId>>, TError,{userId: number}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof deleteOrderDeleteAllCartUserId>>, TError,{userId: number}, TContext> => {
 
-const mutationKey = ['deleteOrderDeleteAllCartUserId'];
+export const getGetOrderOrderIdQueryKey = (orderId: number,) => {
+    return [
+    `/order/${orderId}`
+    ] as const;
+    }
+
+
+export const getGetOrderOrderIdQueryOptions = <TData = Awaited<ReturnType<typeof getOrderOrderId>>, TError = void>(orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderOrderId>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOrderOrderIdQueryKey(orderId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrderOrderId>>> = ({ signal }) => getOrderOrderId(orderId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(orderId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOrderOrderId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetOrderOrderIdQueryResult = NonNullable<Awaited<ReturnType<typeof getOrderOrderId>>>
+export type GetOrderOrderIdQueryError = void
+
+
+export function useGetOrderOrderId<TData = Awaited<ReturnType<typeof getOrderOrderId>>, TError = void>(
+ orderId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderOrderId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOrderOrderId>>,
+          TError,
+          Awaited<ReturnType<typeof getOrderOrderId>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOrderOrderId<TData = Awaited<ReturnType<typeof getOrderOrderId>>, TError = void>(
+ orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderOrderId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOrderOrderId>>,
+          TError,
+          Awaited<ReturnType<typeof getOrderOrderId>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOrderOrderId<TData = Awaited<ReturnType<typeof getOrderOrderId>>, TError = void>(
+ orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderOrderId>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Получить заказ по ID
+ */
+
+export function useGetOrderOrderId<TData = Awaited<ReturnType<typeof getOrderOrderId>>, TError = void>(
+ orderId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrderOrderId>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetOrderOrderIdQueryOptions(orderId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
+ * Можно отменить только заказы в статусе PENDING или PAID
+ * @summary Отменить заказ
+ */
+export const postOrderCancelOrderId = (
+    orderId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<PostOrderCancelOrderId200>(
+      {url: `/order/cancel/${orderId}`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+export const getPostOrderCancelOrderIdMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postOrderCancelOrderId>>, TError,{orderId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postOrderCancelOrderId>>, TError,{orderId: number}, TContext> => {
+
+const mutationKey = ['postOrderCancelOrderId'];
 const {mutation: mutationOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -222,10 +321,10 @@ const {mutation: mutationOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOrderDeleteAllCartUserId>>, {userId: number}> = (props) => {
-          const {userId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postOrderCancelOrderId>>, {orderId: number}> = (props) => {
+          const {orderId} = props ?? {};
 
-          return  deleteOrderDeleteAllCartUserId(userId,)
+          return  postOrderCancelOrderId(orderId,)
         }
 
 
@@ -235,81 +334,20 @@ const {mutation: mutationOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeleteOrderDeleteAllCartUserIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOrderDeleteAllCartUserId>>>
+    export type PostOrderCancelOrderIdMutationResult = NonNullable<Awaited<ReturnType<typeof postOrderCancelOrderId>>>
 
-    export type DeleteOrderDeleteAllCartUserIdMutationError = unknown
+    export type PostOrderCancelOrderIdMutationError = void
 
     /**
- * @summary Очистить корзину
+ * @summary Отменить заказ
  */
-export const useDeleteOrderDeleteAllCartUserId = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOrderDeleteAllCartUserId>>, TError,{userId: number}, TContext>, }
+export const usePostOrderCancelOrderId = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postOrderCancelOrderId>>, TError,{orderId: number}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteOrderDeleteAllCartUserId>>,
+        Awaited<ReturnType<typeof postOrderCancelOrderId>>,
         TError,
-        {userId: number},
+        {orderId: number},
         TContext
       > => {
-      return useMutation(getDeleteOrderDeleteAllCartUserIdMutationOptions(options), queryClient);
-    }
-    /**
- * @summary Удалить товар из корзины
- */
-export const deleteOrderDeleteByIdProductId = (
-    productId: number,
- signal?: AbortSignal
-) => {
-
-
-      return customInstance<DeleteOrderDeleteByIdProductId200>(
-      {url: `/order/delete-by-id/${productId}`, method: 'DELETE', signal
-    },
-      );
-    }
-
-
-
-export const getDeleteOrderDeleteByIdProductIdMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOrderDeleteByIdProductId>>, TError,{productId: number}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof deleteOrderDeleteByIdProductId>>, TError,{productId: number}, TContext> => {
-
-const mutationKey = ['deleteOrderDeleteByIdProductId'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOrderDeleteByIdProductId>>, {productId: number}> = (props) => {
-          const {productId} = props ?? {};
-
-          return  deleteOrderDeleteByIdProductId(productId,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteOrderDeleteByIdProductIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOrderDeleteByIdProductId>>>
-
-    export type DeleteOrderDeleteByIdProductIdMutationError = unknown
-
-    /**
- * @summary Удалить товар из корзины
- */
-export const useDeleteOrderDeleteByIdProductId = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteOrderDeleteByIdProductId>>, TError,{productId: number}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteOrderDeleteByIdProductId>>,
-        TError,
-        {productId: number},
-        TContext
-      > => {
-      return useMutation(getDeleteOrderDeleteByIdProductIdMutationOptions(options), queryClient);
+      return useMutation(getPostOrderCancelOrderIdMutationOptions(options), queryClient);
     }

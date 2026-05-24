@@ -2,10 +2,17 @@
 
 import { useState, type FC } from "react";
 import scss from "./AuthStote.module.scss";
-import { useAuthStore } from "@/src/api/auth";
+import { usePostShopsCreate } from "@/src/api/generated/endpoints/shops/shops";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+
+interface CreateStoreReq {
+  name: string;
+  description?: string;
+  address?: string;
+  region?: string;
+}
 
 const AuthStore: FC = () => {
   const {
@@ -14,9 +21,9 @@ const AuthStore: FC = () => {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<AUTH.CreateStoreReq>();
+  } = useForm<CreateStoreReq>();
 
-  const { mutateAsync: createStore, isPending } = useAuthStore();
+  const { mutateAsync: createStore, isPending } = usePostShopsCreate();
   const router = useRouter();
 
   const [address, setAddress] = useState("");
@@ -25,11 +32,13 @@ const AuthStore: FC = () => {
   );
   const [loadingAddress, setLoadingAddress] = useState(false);
 
-  const onCreateStore = async (data: AUTH.CreateStoreReq) => {
+  const onCreateStore = async (data: CreateStoreReq) => {
     try {
       await createStore({
-        ...data,
-        address,
+        data: {
+          ...data,
+          address,
+        },
       });
 
       reset();

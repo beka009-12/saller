@@ -5,7 +5,7 @@
  * API for my startup
  * OpenAPI spec version: 1.0.0
  */
-import type { CartProduct } from './cartProduct';
+import type { CartItemProduct } from './cartItemProduct';
 
 export interface CartItem {
   id?: number;
@@ -13,5 +13,5 @@ export interface CartItem {
   productId?: number;
   quantity?: number;
   createdAt?: string;
-  product?: CartProduct;
+  product?: CartItemProduct;
 }

@@ -9,5 +9,5 @@
 export interface AddToCartInput {
   productId: number;
   /** @minimum 1 */
-  quantity: number;
+  quantity?: number;
 }

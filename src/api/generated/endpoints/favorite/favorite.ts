@@ -27,7 +27,7 @@ import type {
 import type {
   AddFavoriteInput,
   DeleteFavoriteFavoriteDeleteProductId200,
-  GetFavoriteFavoriteUserId200,
+  GetFavoriteFavorites200,
   PostFavoriteFavoriteAdd201
 } from '../../models';
 
@@ -100,16 +100,16 @@ export const usePostFavoriteFavoriteAdd = <TError = unknown,
       return useMutation(getPostFavoriteFavoriteAddMutationOptions(options), queryClient);
     }
     /**
- * @summary Получить избранное пользователя
+ * @summary Получить избранное текущего пользователя
  */
-export const getFavoriteFavoriteUserId = (
-    userId: number,
+export const getFavoriteFavorites = (
+
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<GetFavoriteFavoriteUserId200>(
-      {url: `/favorite/favorite/${userId}`, method: 'GET', signal
+      return customInstance<GetFavoriteFavorites200>(
+      {url: `/favorite/favorites`, method: 'GET', signal
     },
       );
     }
@@ -117,69 +117,69 @@ export const getFavoriteFavoriteUserId = (
 
 
 
-export const getGetFavoriteFavoriteUserIdQueryKey = (userId: number,) => {
+export const getGetFavoriteFavoritesQueryKey = () => {
     return [
-    `/favorite/favorite/${userId}`
+    `/favorite/favorites`
     ] as const;
     }
 
 
-export const getGetFavoriteFavoriteUserIdQueryOptions = <TData = Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError = unknown>(userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError, TData>>, }
+export const getGetFavoriteFavoritesQueryOptions = <TData = Awaited<ReturnType<typeof getFavoriteFavorites>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavorites>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetFavoriteFavoriteUserIdQueryKey(userId);
+  const queryKey =  queryOptions?.queryKey ?? getGetFavoriteFavoritesQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>> = ({ signal }) => getFavoriteFavoriteUserId(userId, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFavoriteFavorites>>> = ({ signal }) => getFavoriteFavorites(signal);
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: !!(userId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavorites>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetFavoriteFavoriteUserIdQueryResult = NonNullable<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>>
-export type GetFavoriteFavoriteUserIdQueryError = unknown
+export type GetFavoriteFavoritesQueryResult = NonNullable<Awaited<ReturnType<typeof getFavoriteFavorites>>>
+export type GetFavoriteFavoritesQueryError = unknown
 
 
-export function useGetFavoriteFavoriteUserId<TData = Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError = unknown>(
- userId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError, TData>> & Pick<
+export function useGetFavoriteFavorites<TData = Awaited<ReturnType<typeof getFavoriteFavorites>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavorites>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>,
+          Awaited<ReturnType<typeof getFavoriteFavorites>>,
           TError,
-          Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>
+          Awaited<ReturnType<typeof getFavoriteFavorites>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetFavoriteFavoriteUserId<TData = Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError = unknown>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError, TData>> & Pick<
+export function useGetFavoriteFavorites<TData = Awaited<ReturnType<typeof getFavoriteFavorites>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavorites>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>,
+          Awaited<ReturnType<typeof getFavoriteFavorites>>,
           TError,
-          Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>
+          Awaited<ReturnType<typeof getFavoriteFavorites>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetFavoriteFavoriteUserId<TData = Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError = unknown>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError, TData>>, }
+export function useGetFavoriteFavorites<TData = Awaited<ReturnType<typeof getFavoriteFavorites>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavorites>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Получить избранное пользователя
+ * @summary Получить избранное текущего пользователя
  */
 
-export function useGetFavoriteFavoriteUserId<TData = Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError = unknown>(
- userId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavoriteUserId>>, TError, TData>>, }
+export function useGetFavoriteFavorites<TData = Awaited<ReturnType<typeof getFavoriteFavorites>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getFavoriteFavorites>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetFavoriteFavoriteUserIdQueryOptions(userId,options)
+  const queryOptions = getGetFavoriteFavoritesQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

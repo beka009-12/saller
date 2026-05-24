@@ -1,19 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
-
-$bg: #ffffff;
-$white: #ffffff;
-$border: #e4e4e0;
-$text: #111110;
-$muted: #888884;
-$radius: 6px;
-
+// ── Order page ────────────────────────────────────────────────────────────────
 .Order {
-  min-height: 100vh;
-  background: $bg;
-  font-family: "Inter", sans-serif;
-  color: $text;
-  font-size: 14px;
-  padding: 36px 0 80px;
+  padding: 32px 0 80px;
   user-select: none;
 }
 
@@ -22,13 +9,15 @@ $radius: 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
 
   h1 {
+    font-family: var(--font-display);
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--text-0);
     margin: 0;
     letter-spacing: -0.3px;
   }
@@ -37,10 +26,9 @@ $radius: 6px;
 .stats {
   display: flex;
   align-items: center;
-  gap: 0;
-  background: $white;
-  border: 1px solid $border;
-  border-radius: $radius;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
   overflow: hidden;
 }
 
@@ -49,25 +37,28 @@ $radius: 6px;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  padding: 10px 20px;
+  padding: 10px 18px;
 }
 
 .statNum {
-  font-size: 18px;
+  font-family: var(--font-mono);
+  font-size: 17px;
   font-weight: 600;
   line-height: 1;
+  color: var(--text-0);
 }
 
 .statLabel {
-  font-size: 11px;
-  color: $muted;
+  font-size: 10px;
+  color: var(--text-2);
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
 .statDivider {
   width: 1px;
   height: 36px;
-  background: $border;
+  background: var(--border-strong);
   flex-shrink: 0;
 }
 
@@ -83,30 +74,32 @@ $radius: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border: 1px solid $border;
-  border-radius: 20px;
-  background: $white;
-  font-family: inherit;
-  font-size: 13px;
-  color: $muted;
+  padding: 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--bg-2);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-1);
   cursor: pointer;
   transition: all 0.12s;
 
   &:hover {
-    border-color: #bbb;
-    color: $text;
+    border-color: var(--border-accent);
+    color: var(--text-0);
+    background: var(--bg-3);
   }
 }
 
 .filterActive {
-  background: $text;
-  border-color: $text;
-  color: $white;
+  background: var(--accent-dim);
+  border-color: var(--border-accent);
+  color: var(--accent);
 
   &:hover {
-    border-color: $text;
-    color: $white;
+    background: var(--accent-dim);
+    border-color: var(--border-accent);
+    color: var(--accent);
   }
 }
 
@@ -117,47 +110,45 @@ $radius: 6px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  background: $border;
+  background: var(--bg-4);
   border-radius: 9px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: $text;
+  color: var(--text-1);
 }
 
 .badgeActive {
-  background: rgba(255, 255, 255, 0.25);
-  color: $white;
+  background: rgba(245,166,35,0.25);
+  color: var(--accent);
 }
 
 // ── Table (desktop) ───────────────────────────────────────────────────────────
 .table {
-  background: $white;
-  border: 1px solid $border;
-  border-radius: $radius;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
   overflow: hidden;
 }
 
 .tableHead {
   display: grid;
   grid-template-columns: 70px 160px 1fr 180px 110px 110px 32px;
-  padding: 10px 16px;
-  border-bottom: 1px solid $border;
-  background: $bg;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border-strong);
+  background: var(--bg-3);
 
   span {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.7px;
-    color: $muted;
+    letter-spacing: 1px;
+    color: var(--text-2);
   }
 }
 
 .rowWrap {
-  border-bottom: 1px solid $border;
-  &:last-child {
-    border-bottom: none;
-  }
+  border-bottom: 1px solid var(--border);
+  &:last-child { border-bottom: none; }
 }
 
 .row {
@@ -167,22 +158,20 @@ $radius: 6px;
   padding: 14px 16px;
   cursor: pointer;
   transition: background 0.1s;
-  gap: 0;
 
-  &:hover {
-    background: #00000008;
-  }
+  &:hover { background: var(--bg-3); }
 }
 
 .rowOpen {
-  background: #fafaf8;
-  border-bottom: 1px solid $border;
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .orderId {
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 600;
-  color: $muted;
+  color: var(--text-2);
 }
 
 .buyer {
@@ -192,11 +181,12 @@ $radius: 6px;
 
   b {
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--text-0);
   }
   small {
-    font-size: 12px;
-    color: $muted;
+    font-size: 11px;
+    color: var(--text-2);
   }
 }
 
@@ -211,74 +201,64 @@ $radius: 6px;
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  background: $bg;
-  border: 1px solid $border;
-  border-radius: 4px;
-  font-size: 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  color: var(--text-1);
   white-space: nowrap;
 
   em {
     font-style: normal;
     font-weight: 600;
-    color: $muted;
+    color: var(--text-2);
   }
 }
 
 .address {
-  font-size: 13px;
-  color: $muted;
+  font-size: 12px;
+  color: var(--text-2);
   line-height: 1.4;
   padding-right: 8px;
 }
 
 .total {
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
   font-weight: 600;
+  color: var(--text-0);
 }
 
 // ── Status badges ─────────────────────────────────────────────────────────────
 .status {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   width: fit-content;
 }
 
-.s_PENDING {
-  background: #fff8e1;
-  color: #b45309;
-}
-.s_PAID {
-  background: #e0f2fe;
-  color: #0369a1;
-}
-.s_SHIPPED {
-  background: #ede9fe;
-  color: #6d28d9;
-}
-.s_COMPLETED {
-  background: #dcfce7;
-  color: #15803d;
-}
-.s_CANCELED {
-  background: #fee2e2;
-  color: #b91c1c;
-}
+.s_PENDING   { background: rgba(245,166,35,0.12); color: var(--accent); }
+.s_PAID      { background: var(--blue-dim);        color: var(--blue); }
+.s_PROCESSING{ background: var(--purple-dim);      color: var(--purple); }
+.s_SHIPPED   { background: var(--purple-dim);      color: var(--purple); }
+.s_COMPLETED { background: var(--green-dim);       color: var(--green); }
+.s_CANCELED  { background: var(--red-dim);         color: var(--red); }
 
 .chevron {
   font-size: 10px;
-  color: $muted;
+  color: var(--text-2);
   text-align: right;
 }
 
 // ── Expanded Detail ───────────────────────────────────────────────────────────
 .detail {
   padding: 20px 16px 20px 86px;
-  background: #faf9f8;
-  border-top: 1px solid $border;
+  background: var(--bg-3);
+  border-top: 1px solid var(--border-strong);
 }
 
 .detailGrid {
@@ -295,28 +275,29 @@ $radius: 6px;
 }
 
 .dlabel {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.7px;
-  color: $muted;
+  letter-spacing: 1px;
+  color: var(--text-2);
   margin: 0 0 6px;
 }
 
 .dval {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
+  color: var(--text-0);
   margin: 0;
   line-height: 1.4;
 }
 
 .dsub {
-  font-size: 13px;
-  color: $muted;
+  font-size: 12px;
+  color: var(--text-2);
   margin: 0;
 
   b {
-    color: $text;
+    color: var(--text-1);
     font-weight: 500;
   }
 }
@@ -328,36 +309,37 @@ $radius: 6px;
 
   td {
     padding: 5px 0;
-    font-size: 13px;
-    border-bottom: 1px solid $border;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
     vertical-align: middle;
+    color: var(--text-1);
   }
 
-  tr:last-child td {
-    border-bottom: none;
-  }
+  tr:last-child td { border-bottom: none; }
 }
 
 .tdQty {
-  color: $muted;
+  color: var(--text-2);
   text-align: center;
   width: 60px;
 }
 
 .tdPrice {
   text-align: right;
+  font-family: var(--font-mono);
   font-weight: 600;
   white-space: nowrap;
   width: 100px;
+  color: var(--text-0);
 }
 
 .trTotal {
   td {
     font-weight: 600;
-    border-top: 1px solid $border;
+    border-top: 1px solid var(--border-strong);
     border-bottom: none;
     padding-top: 8px;
-    color: $text;
+    color: var(--text-0);
   }
 }
 
@@ -365,34 +347,30 @@ $radius: 6px;
 .actionBtn {
   margin-top: 12px;
   padding: 8px 16px;
-  background: $text;
-  color: $white;
+  background: var(--accent);
+  color: #000;
   border: none;
-  border-radius: $radius;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: opacity 0.12s;
   width: 100%;
 
-  &:hover {
-    opacity: 0.8;
-  }
+  &:hover { opacity: 0.85; }
 }
 
 // ── Empty ─────────────────────────────────────────────────────────────────────
 .empty {
   text-align: center;
   padding: 60px;
-  color: $muted;
-  background: $white;
-  border: 1px solid $border;
-  border-radius: $radius;
+  color: var(--text-2);
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
 }
 
 // ── Mobile card ───────────────────────────────────────────────────────────────
-// Карточка-замена строке таблицы на мобилке
 .mobileCard {
   display: none;
   flex-direction: column;
@@ -401,14 +379,10 @@ $radius: 6px;
   cursor: pointer;
   transition: background 0.1s;
 
-  &:hover {
-    background: #00000005;
-  }
+  &:hover { background: var(--bg-3); }
 }
 
-.mobileCardOpen {
-  background: #fafaf8;
-}
+.mobileCardOpen { background: var(--bg-3); }
 
 .mobileCardTop {
   display: flex;
@@ -418,9 +392,10 @@ $radius: 6px;
 }
 
 .mobileCardId {
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 600;
-  color: $muted;
+  color: var(--text-2);
   flex-shrink: 0;
 }
 
@@ -432,16 +407,17 @@ $radius: 6px;
   min-width: 0;
 
   b {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
+    color: var(--text-0);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   small {
-    font-size: 12px;
-    color: $muted;
+    font-size: 11px;
+    color: var(--text-2);
   }
 }
 
@@ -453,138 +429,44 @@ $radius: 6px;
 }
 
 .mobileCardTotal {
-  font-size: 15px;
+  font-family: var(--font-mono);
+  font-size: 14px;
   font-weight: 600;
+  color: var(--text-0);
 }
 
 .mobileCardChevron {
   font-size: 10px;
-  color: $muted;
+  color: var(--text-2);
   flex-shrink: 0;
 }
 
-// ─── RESPONSIVE ──────────────────────────────────────────────────────────────
-
-// Планшет — убираем адрес, сужаем колонки
+// ── Responsive ────────────────────────────────────────────────────────────────
 @media (max-width: 1024px) {
   .tableHead {
     grid-template-columns: 70px 150px 1fr 110px 110px 32px;
-
-    // Скрываем заголовок адреса
-    span:nth-child(4) {
-      display: none;
-    }
+    span:nth-child(4) { display: none; }
   }
-
-  .row {
-    grid-template-columns: 70px 150px 1fr 110px 110px 32px;
-  }
-
-  .address {
-    display: none;
-  }
-
-  .detail {
-    padding-left: 16px;
-  }
-
-  .detailGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  // Блок "Действие" переносим на всю ширину
-  .detailBlock:last-child {
-    grid-column: 1 / -1;
-  }
+  .row { grid-template-columns: 70px 150px 1fr 110px 110px 32px; }
+  .address { display: none; }
+  .detail { padding-left: 16px; }
+  .detailGrid { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .detailBlock:last-child { grid-column: 1 / -1; }
 }
 
-// Мобилка — карточки вместо таблицы
 @media (max-width: 768px) {
-  .Order {
-    padding: 20px 0 60px;
-  }
-
-  .header {
-    margin-bottom: 20px;
-    flex-direction: column;
-    align-items: flex-start;
-
-    h1 {
-      font-size: 20px;
-    }
-  }
-
-  .stats {
-    width: 100%;
-
-    .stat {
-      flex: 1;
-      padding: 10px 12px;
-    }
-
-    .statNum {
-      font-size: 16px;
-    }
-
-    .statLabel {
-      font-size: 10px;
-    }
-  }
-
-  // Таблица — скрываем шапку и строки
-  .tableHead {
-    display: none;
-  }
-
-  .row {
-    display: none;
-  }
-
-  // Показываем карточки
-  .mobileCard {
-    display: flex;
-  }
-
-  .detail {
-    padding: 16px;
-    border-top: 1px solid $border;
-  }
-
-  .detailGrid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .detailBlock:last-child {
-    grid-column: auto;
-  }
+  .Order { padding: 20px 0 60px; }
+  .header { margin-bottom: 20px; flex-direction: column; align-items: flex-start; }
+  .stats { width: 100%; .stat { flex: 1; padding: 10px 12px; } }
+  .tableHead { display: none; }
+  .row { display: none; }
+  .mobileCard { display: flex; }
+  .detail { padding: 16px; }
+  .detailGrid { grid-template-columns: 1fr; gap: 20px; }
 }
 
-// Очень маленькие экраны
 @media (max-width: 400px) {
-  .stats {
-    flex-direction: column;
-
-    .statDivider {
-      width: 100%;
-      height: 1px;
-    }
-
-    .stat {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 14px;
-    }
-
-    .statNum {
-      font-size: 15px;
-    }
-  }
-
-  .filterBtn {
-    font-size: 12px;
-    padding: 5px 10px;
-  }
+  .stats { flex-direction: column; }
+  .statDivider { width: 100%; height: 1px; }
+  .filterBtn { font-size: 11px; padding: 5px 10px; }
 }

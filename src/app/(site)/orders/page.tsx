@@ -1,6 +1,6 @@
-import OrderPage from "@/src/pages/OrderPage";
+import Order from "@/src/pages/order/Order";
 
 const page = () => {
-  return <OrderPage />;
+  return <Order />;
 };
 export default page;

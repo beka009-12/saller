@@ -7,6 +7,7 @@
  */
 import type { Category } from './category';
 import type { ProductGender } from './productGender';
+import type { ProductImage } from './productImage';
 import type { ProductSeason } from './productSeason';
 import type { Store } from './store';
 
@@ -17,7 +18,6 @@ export interface Product {
   price?: number;
   /** @nullable */
   newPrice?: number | null;
-  images?: string[];
   /** @nullable */
   brandName?: string | null;
   /** @nullable */
@@ -32,12 +32,12 @@ export interface Product {
   season?: ProductSeason;
   stockCount?: number;
   soldCount?: number;
-  views?: number;
+  isActive?: boolean;
   storeId?: number;
   categoryId?: number;
-  isActive?: boolean;
   category?: Category;
   store?: Store;
+  productImages?: ProductImage[];
   createdAt?: string;
   updatedAt?: string;
 }

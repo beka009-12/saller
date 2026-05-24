@@ -5,19 +5,43 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import {
-  usePostSallerSignInSaller,
-  usePostSallerSignUpSaller,
-} from "@/src/api/generated/endpoints/saller/saller";
+  usePostAuthSignIn,
+  usePostAuthSignUpSeller,
+  usePostAuthGoogleSeller,
+} from "@/src/api/generated/endpoints/auth/auth";
 import { LoginInput, RegisterInput } from "@/src/api/generated/models";
+import dynamic from "next/dynamic";
+
+const GoogleLogin = dynamic(
+  () => import("@react-oauth/google").then((m) => ({ default: m.GoogleLogin })),
+  { ssr: false },
+);
 
 const Authentication: FC = () => {
   const searchParams = useSearchParams();
   const mode = searchParams?.get("mode");
   const [isLogin, setIsLogin] = useState(mode === "login");
 
-  const { mutateAsync: signUpMutate } = usePostSallerSignUpSaller();
-  const { mutateAsync: signInMutate } = usePostSallerSignInSaller();
+  const { mutateAsync: signUpMutate } = usePostAuthSignUpSeller();
+  const { mutateAsync: signInMutate } = usePostAuthSignIn();
+  const { mutateAsync: googleMutate } = usePostAuthGoogleSeller();
   const router = useRouter();
+
+  const onGoogleSuccess = async (credentialResponse: { credential?: string }) => {
+    try {
+      const idToken = credentialResponse.credential;
+      if (!idToken) throw new Error("No credential");
+      const response = await googleMutate({ data: { idToken } });
+      const token = (response as any)?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        toast.success("Вход через Google выполнен!");
+        router.push("/");
+      }
+    } catch {
+      toast.error("Ошибка входа через Google");
+    }
+  };
 
   const {
     register: registerSignUp,
@@ -31,9 +55,7 @@ const Authentication: FC = () => {
   const onRegister: SubmitHandler<RegisterInput> = async (formData) => {
     try {
       const response = await signUpMutate({ data: formData });
-
-      const token = response?.token;
-
+      const token = (response as any)?.token;
       if (token) {
         localStorage.setItem("token", token);
         toast.success("Регистрация успешна!");
@@ -49,10 +71,7 @@ const Authentication: FC = () => {
   const onLogin: SubmitHandler<LoginInput> = async (formData) => {
     try {
       const response = await signInMutate({ data: formData });
-
-      // Проверяем наличие данных и токена
-      const token = response?.token;
-
+      const token = (response as any)?.result?.token ?? (response as any)?.token;
       if (token) {
         localStorage.setItem("token", token);
         toast.success("Вход выполнен!");
@@ -96,6 +115,17 @@ const Authentication: FC = () => {
                 </button>
               </form>
 
+              <div className={scss.divider}>
+                <span>или</span>
+              </div>
+
+              <GoogleLogin
+                onSuccess={onGoogleSuccess}
+                onError={() => toast.error("Ошибка входа через Google")}
+                width="100%"
+                text="signin_with"
+              />
+
               <p
                 onClick={() => setIsLogin(false)}
                 className={scss.registerLink}
@@ -137,7 +167,7 @@ const Authentication: FC = () => {
                 />
                 <input
                   className={scss.inputs}
-                  {...registerSignUp("phone" as any)} // Исправлено: добавлено имя поля
+                  {...registerSignUp("phone" as any)}
                   type="tel"
                   placeholder="Телефон"
                 />
@@ -145,6 +175,17 @@ const Authentication: FC = () => {
                   Зарегистрироваться
                 </button>
               </form>
+
+              <div className={scss.divider}>
+                <span>или</span>
+              </div>
+
+              <GoogleLogin
+                onSuccess={onGoogleSuccess}
+                onError={() => toast.error("Ошибка входа через Google")}
+                width="100%"
+                text="signup_with"
+              />
 
               <p className={scss.registerLink} onClick={() => setIsLogin(true)}>
                 Уже есть аккаунт? <span>Войти</span>

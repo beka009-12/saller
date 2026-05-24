@@ -12,12 +12,15 @@ export interface CreateProductInput {
   title: string;
   description: string;
   price: number;
-  newPrice?: number;
+  /** @nullable */
+  newPrice?: number | null;
   categoryId: number;
-  brandName?: string;
+  /** @nullable */
+  brandName?: string | null;
   sizes: string[];
   colors: string[];
-  material?: string;
+  /** @nullable */
+  material?: string | null;
   gender: CreateProductInputGender;
   season: CreateProductInputSeason;
   stockCount?: number;

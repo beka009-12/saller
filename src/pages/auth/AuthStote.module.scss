@@ -2,47 +2,62 @@
   padding: 60px 0;
   display: flex;
   justify-content: center;
+  background: var(--bg-1);
+  min-height: 100dvh;
 }
 
 .card {
   max-width: 500px;
   width: 100%;
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  padding: 36px;
+  border-radius: var(--r-md);
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 30px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-0);
+  margin-bottom: 24px;
+  letter-spacing: -0.3px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+
+  label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
 }
 
-.input,
-.textarea {
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #e2e2e2;
-  font-size: 14px;
-  transition: 0.2s;
+.input, .textarea {
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-3);
+  color: var(--text-0);
+  font-size: 13px;
+  transition: border-color 0.14s;
+
+  &::placeholder { color: var(--text-2); }
 }
 
-.input:focus,
-.textarea:focus {
-  border-color: #6366f1;
+.input:focus, .textarea:focus {
+  border-color: var(--border-accent);
   outline: none;
 }
 
@@ -53,33 +68,34 @@
 }
 
 .primaryBtn {
-  padding: 14px;
-  border-radius: 14px;
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--r-sm);
   border: none;
-  background: #6366f1;
-  color: white;
-  font-weight: 500;
+  background: var(--accent);
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
-}
+  transition: opacity 0.14s;
 
-.primaryBtn:hover {
-  background: #4f46e5;
+  &:hover { opacity: 0.85; }
 }
 
 .secondaryBtn {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid #dcdcdc;
-  background: #f9f9f9;
+  padding: 10px 16px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-3);
+  color: var(--text-1);
+  font-size: 13px;
   cursor: pointer;
-}
+  transition: all 0.14s;
 
-.secondaryBtn:hover {
-  background: #f1f1f1;
+  &:hover { background: var(--bg-4); color: var(--text-0); }
 }
 
 .error {
-  color: #ef4444;
+  color: var(--red);
   font-size: 12px;
 }

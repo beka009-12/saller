@@ -358,25 +358,80 @@ const Step3Attributes: FC<{
         </div>
       </div>
 
-      {/* ── Colors — placeholder, replaced in Task 4 ── */}
+      {/* ── Colors ── */}
       <div className={scss.field}>
         <label>Цвета *</label>
-        <div className={scss.tagInput}>
+
+        {/* Preset swatches — only show unselected ones */}
+        <div className={scss.colorPresets}>
+          {COLOR_PRESETS.filter(({ hex }) => !data.colors.includes(hex)).map(
+            ({ hex, label }) => (
+              <button
+                key={hex}
+                type="button"
+                title={label}
+                className={scss.colorPreset}
+                style={{ background: hex }}
+                onClick={() => onChange("colors", [...data.colors, hex])}
+              />
+            )
+          )}
+        </div>
+
+        {/* Picker row */}
+        <div className={scss.colorPickerRow}>
+          <input
+            type="color"
+            value={colorPicker}
+            className={scss.colorSwatch}
+            onChange={(e) => {
+              setColorPicker(e.target.value);
+              setColorHex(e.target.value);
+            }}
+          />
           <input
             type="text"
-            placeholder="Чёрный, Белый, Красный или #000000, #FFFFFF"
-            value={data.colors.join(", ")}
-            onChange={(e) =>
-              onChange(
-                "colors",
-                e.target.value
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              )
-            }
+            placeholder="#000000 или rgb(0,0,0)"
+            value={colorHex}
+            className={hexError ? scss.inputError : ""}
+            onChange={(e) => {
+              setColorHex(e.target.value);
+              const hex = normalizeHex(e.target.value);
+              if (hex) {
+                setColorPicker(hex);
+                setHexError(null);
+              }
+            }}
+            onKeyDown={(e) => e.key === "Enter" && addColor()}
           />
+          <button type="button" className={scss.btnAddColor} onClick={addColor}>
+            Добавить
+          </button>
         </div>
+        {hexError && <span className={scss.errorMsg}>{hexError}</span>}
+
+        {/* Tags */}
+        {data.colors.length > 0 && (
+          <div className={scss.tags}>
+            {data.colors.map((c) => (
+              <span key={c} className={scss.tag}>
+                <span className={scss.colorDot} style={{ background: c }} />
+                {c}
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange(
+                      "colors",
+                      data.colors.filter((x) => x !== c)
+                    )
+                  }
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className={scss.fieldRow}>

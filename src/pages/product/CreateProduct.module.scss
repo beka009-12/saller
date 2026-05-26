@@ -447,3 +447,72 @@
     color: var(--accent);
   }
 }
+
+// ── Color picker ──────────────────────────────────────────────────────────────
+.colorPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.colorPreset {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: transform 0.1s, box-shadow 0.1s;
+
+  &:hover {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 2px var(--border-accent);
+  }
+}
+
+.colorPickerRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  input[type="text"] { flex: 1; }
+}
+
+.colorSwatch {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  padding: 2px;
+  background: none;
+  flex-shrink: 0;
+}
+
+.btnAddColor {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 0 14px;
+  height: 38px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.14s;
+  flex-shrink: 0;
+
+  &:hover { opacity: 0.85; }
+}
+
+.colorDot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}

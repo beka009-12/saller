@@ -423,3 +423,27 @@
 
   &:hover { opacity: 0.85; }
 }
+
+// ── Size hints ────────────────────────────────────────────────────────────────
+.sizeHints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.sizeHint {
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: var(--r-sm);
+  border: 1px dashed var(--border-strong);
+  background: none;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.12s;
+
+  &:hover {
+    border-color: var(--border-accent);
+    color: var(--accent);
+  }
+}

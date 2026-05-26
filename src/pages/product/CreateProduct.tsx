@@ -209,10 +209,17 @@ const Step2Info: FC<{
 };
 
 // ─── Step 3: Attributes ───────────────────────────────────────────────────────
+const SIZE_HINTS = ["S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"];
+
 const Step3Attributes: FC<{
   data: FormState;
   onChange: (key: keyof FormState, value: unknown) => void;
 }> = ({ data, onChange }) => {
+  const [sizeInput, setSizeInput] = useState("");
+  const [colorPicker, setColorPicker] = useState("#000000");
+  const [colorHex, setColorHex] = useState("#000000");
+  const [hexError, setHexError] = useState<string | null>(null);
+
   const GENDER_OPTIONS: { value: Gender; label: string }[] = [
     { value: "MALE", label: "Мужской" },
     { value: "FEMALE", label: "Женский" },
@@ -225,44 +232,148 @@ const Step3Attributes: FC<{
     { value: "ALL_SEASON", label: "Всесезонный" },
   ];
 
+  const addSize = (value: string) => {
+    const trimmed = value.trim();
+    if (trimmed && !data.sizes.includes(trimmed)) {
+      onChange("sizes", [...data.sizes, trimmed]);
+    }
+  };
+
+  const handleSizeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addSize(sizeInput);
+      setSizeInput("");
+    }
+  };
+
+  const COLOR_PRESETS = [
+    { hex: "#000000", label: "Чёрный" },
+    { hex: "#ffffff", label: "Белый" },
+    { hex: "#f5f0e8", label: "Бежевый" },
+    { hex: "#808080", label: "Серый" },
+    { hex: "#c41e3a", label: "Красный" },
+    { hex: "#001f5b", label: "Navy" },
+    { hex: "#3b82f6", label: "Синий" },
+    { hex: "#22c55e", label: "Зелёный" },
+    { hex: "#f97316", label: "Оранжевый" },
+    { hex: "#a855f7", label: "Фиолетовый" },
+  ];
+
+  const normalizeHex = (input: string): string | null => {
+    const trimmed = input.trim();
+    const rgbMatch = trimmed.match(
+      /^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
+    );
+    if (rgbMatch) {
+      const r = parseInt(rgbMatch[1]).toString(16).padStart(2, "0");
+      const g = parseInt(rgbMatch[2]).toString(16).padStart(2, "0");
+      const b = parseInt(rgbMatch[3]).toString(16).padStart(2, "0");
+      return `#${r}${g}${b}`;
+    }
+    const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+    if (/^#[0-9a-fA-F]{3}$/.test(withHash)) {
+      const [, r, g, b] = withHash.split("");
+      return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+    }
+    if (/^#[0-9a-fA-F]{6}$/.test(withHash)) {
+      return withHash.toLowerCase();
+    }
+    return null;
+  };
+
+  const addColor = () => {
+    const hex = normalizeHex(colorHex);
+    if (!hex) {
+      setHexError("Неверный формат. Пример: #3B82F6 или rgb(59,130,246)");
+      return;
+    }
+    setHexError(null);
+    if (!data.colors.includes(hex)) {
+      onChange("colors", [...data.colors, hex]);
+    }
+    setColorPicker("#000000");
+    setColorHex("#000000");
+  };
+
   return (
     <div className={scss.step}>
       <h2 className={scss.stepTitle}>Характеристики</h2>
 
+      {/* ── Sizes ── */}
       <div className={scss.field}>
-        <label>Размеры (через запятую)</label>
-        <input
-          type="text"
-          placeholder="37, 38, 39, 40, 41, 42"
-          value={data.sizes.join(", ")}
-          onChange={(e) =>
-            onChange(
-              "sizes",
-              e.target.value
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean),
-            )
-          }
-        />
+        <label>Размеры *</label>
+        <div className={scss.tagInput}>
+          <input
+            type="text"
+            placeholder="Например: 38, M, XL..."
+            value={sizeInput}
+            onChange={(e) => setSizeInput(e.target.value)}
+            onKeyDown={handleSizeKeyDown}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              addSize(sizeInput);
+              setSizeInput("");
+            }}
+          >
+            +
+          </button>
+        </div>
+        {data.sizes.length > 0 && (
+          <div className={scss.tags}>
+            {data.sizes.map((s) => (
+              <span key={s} className={scss.tag}>
+                {s}
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange(
+                      "sizes",
+                      data.sizes.filter((x) => x !== s)
+                    )
+                  }
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        <div className={scss.sizeHints}>
+          {SIZE_HINTS.filter((h) => !data.sizes.includes(h)).map((hint) => (
+            <button
+              key={hint}
+              type="button"
+              className={scss.sizeHint}
+              onClick={() => onChange("sizes", [...data.sizes, hint])}
+            >
+              {hint}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* ── Colors — placeholder, replaced in Task 4 ── */}
       <div className={scss.field}>
-        <label>Цвета (через запятую)</label>
-        <input
-          type="text"
-          placeholder="Чёрный, Белый, Красный или #000000, #FFFFFF"
-          value={data.colors.join(", ")}
-          onChange={(e) =>
-            onChange(
-              "colors",
-              e.target.value
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean),
-            )
-          }
-        />
+        <label>Цвета *</label>
+        <div className={scss.tagInput}>
+          <input
+            type="text"
+            placeholder="Чёрный, Белый, Красный или #000000, #FFFFFF"
+            value={data.colors.join(", ")}
+            onChange={(e) =>
+              onChange(
+                "colors",
+                e.target.value
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              )
+            }
+          />
+        </div>
       </div>
 
       <div className={scss.fieldRow}>

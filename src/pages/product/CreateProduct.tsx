@@ -266,9 +266,10 @@ const Step3Attributes: FC<{
       /^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
     );
     if (rgbMatch) {
-      const r = parseInt(rgbMatch[1]).toString(16).padStart(2, "0");
-      const g = parseInt(rgbMatch[2]).toString(16).padStart(2, "0");
-      const b = parseInt(rgbMatch[3]).toString(16).padStart(2, "0");
+      const clamp = (n: number) => Math.max(0, Math.min(255, n));
+      const r = clamp(parseInt(rgbMatch[1])).toString(16).padStart(2, "0");
+      const g = clamp(parseInt(rgbMatch[2])).toString(16).padStart(2, "0");
+      const b = clamp(parseInt(rgbMatch[3])).toString(16).padStart(2, "0");
       return `#${r}${g}${b}`;
     }
     const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
@@ -288,10 +289,12 @@ const Step3Attributes: FC<{
       setHexError("Неверный формат. Пример: #3B82F6 или rgb(59,130,246)");
       return;
     }
-    setHexError(null);
-    if (!data.colors.includes(hex)) {
-      onChange("colors", [...data.colors, hex]);
+    if (data.colors.includes(hex)) {
+      setHexError("Этот цвет уже добавлен");
+      return;
     }
+    setHexError(null);
+    onChange("colors", [...data.colors, hex]);
     setColorPicker("#000000");
     setColorHex("#000000");
   };

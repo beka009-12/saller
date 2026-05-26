@@ -275,7 +275,7 @@ const Step3Attributes: FC<{
     const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
     if (/^#[0-9a-fA-F]{3}$/.test(withHash)) {
       const [, r, g, b] = withHash.split("");
-      return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+      return (`#${r}${r}${g}${g}${b}${b}`).toLowerCase();
     }
     if (/^#[0-9a-fA-F]{6}$/.test(withHash)) {
       return withHash.toLowerCase();
@@ -399,6 +399,8 @@ const Step3Attributes: FC<{
               const hex = normalizeHex(e.target.value);
               if (hex) {
                 setColorPicker(hex);
+                setHexError(null);
+              } else {
                 setHexError(null);
               }
             }}

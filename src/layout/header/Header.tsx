@@ -6,8 +6,9 @@ import { useCurrentSeller } from "../../hooks/use-current-seller";
 import {
   LayoutDashboard, Package, ShoppingBag, Megaphone,
   Settings, LogOut, User, Store, Menu, X,
-  ChevronRight, Zap, BarChart2,
+  ChevronRight, Zap, BarChart2, Sun, Moon,
 } from "lucide-react";
+import { useTheme } from "@/src/hooks/use-theme";
 
 const NAV = [
   { label: "Дашборд",   path: "/",          icon: LayoutDashboard },
@@ -23,6 +24,7 @@ const Header: FC = () => {
   const pathname = usePathname();
   const { data: seller, isLoading, isError } = useCurrentSeller();
   const [mobile, setMobile] = useState(false);
+  const { isDark, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!isLoading && (!seller || isError)) router.replace("/register");
@@ -113,6 +115,9 @@ const Header: FC = () => {
                 <span className={scss.userName}>{name}</span>
                 <span className={scss.userEmail}>{email}</span>
               </div>
+            </button>
+            <button className={scss.themeBtn} onClick={toggleTheme} aria-label="Сменить тему">
+              {isDark ? <Sun size={14} /> : <Moon size={14} />}
             </button>
             <button className={scss.logoutBtn} onClick={handleLogout} aria-label="Выйти">
               <LogOut size={14} />

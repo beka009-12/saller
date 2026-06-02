@@ -6,15 +6,16 @@ import { useCurrentSeller } from "../../hooks/use-current-seller";
 import {
   LayoutDashboard, Package, ShoppingBag, Megaphone,
   Settings, LogOut, User, Store, Menu, X,
-  ChevronRight, Zap,
+  ChevronRight, Zap, BarChart2,
 } from "lucide-react";
 
 const NAV = [
-  { label: "Дашборд",  path: "/",         icon: LayoutDashboard },
-  { label: "Товары",   path: "/products",  icon: Package },
-  { label: "Заказы",   path: "/orders",    icon: ShoppingBag },
-  { label: "Баннеры",  path: "/banners",   icon: Megaphone },
-  { label: "Настройки",path: "/settings",  icon: Settings },
+  { label: "Дашборд",   path: "/",          icon: LayoutDashboard },
+  { label: "Товары",    path: "/products",   icon: Package },
+  { label: "Заказы",    path: "/orders",     icon: ShoppingBag },
+  { label: "Аналитика", path: "/analytics",  icon: BarChart2 },
+  { label: "Баннеры",   path: "/banners",    icon: Megaphone },
+  { label: "Настройки", path: "/settings",   icon: Settings },
 ];
 
 const Header: FC = () => {

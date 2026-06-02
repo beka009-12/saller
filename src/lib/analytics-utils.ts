@@ -89,7 +89,8 @@ export function getTopProducts(orders: AnyOrder[]): TopProduct[] {
 
   for (const order of orders) {
     for (const item of order.items ?? []) {
-      const id = item.productId ?? 0;
+      const id = item.productId;
+      if (id === undefined) continue;
       const existing = map.get(id) ?? {
         productId: id,
         title: item.product?.title ?? `Товар #${id}`,

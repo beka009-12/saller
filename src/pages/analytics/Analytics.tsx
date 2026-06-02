@@ -4,9 +4,9 @@ import { AlertTriangle } from 'lucide-react';
 import { useGetShopsOrders } from '@/src/api/generated/endpoints/shops/shops';
 import { useGetCommodityMyProducts } from '@/src/api/generated/endpoints/product/product';
 import scss from './Analytics.module.scss';
-import StatsCards from './components/StatsCards';
-import RevenueChart from './components/RevenueChart';
-import TopProducts from './components/TopProducts';
+import StatsCards from '@/src/components/analytics/StatsCards';
+import RevenueChart from '@/src/components/analytics/RevenueChart';
+import TopProducts from '@/src/components/analytics/TopProducts';
 import {
   type Period,
   filterOrdersByPeriod,
@@ -25,10 +25,11 @@ const PERIODS: { label: string; value: Period }[] = [
 const Analytics: FC = () => {
   const [period, setPeriod] = useState<Period>('week');
 
-  const { data: ordersData, isLoading: ordersLoading } = useGetShopsOrders();
-  const { data: productsData, isLoading: productsLoading } = useGetCommodityMyProducts();
+  const { data: ordersData, isLoading: ordersLoading, isError: ordersError } = useGetShopsOrders();
+  const { data: productsData, isLoading: productsLoading, isError: productsError } = useGetCommodityMyProducts();
 
   const loading = ordersLoading || productsLoading;
+  const isError = ordersError || productsError;
   const allOrders = (ordersData?.orders ?? []) as AnyOrder[];
   const allProducts = productsData?.products ?? [];
 
@@ -41,8 +42,9 @@ const Analytics: FC = () => {
   const chartData = useMemo(() => buildChartData(filteredOrders, period), [filteredOrders, period]);
   const topProducts = useMemo(() => getTopProducts(filteredOrders), [filteredOrders]);
 
-  const lowStockProducts = allProducts.filter(
-    (p) => (p.stockCount ?? 0) <= 5 && (p.stockCount ?? 0) > 0
+  const lowStockProducts = useMemo(
+    () => allProducts.filter((p) => (p.stockCount ?? 0) <= 5 && (p.stockCount ?? 0) > 0),
+    [allProducts]
   );
 
   return (
@@ -62,10 +64,14 @@ const Analytics: FC = () => {
         </div>
       </div>
 
+      {isError && (
+        <div className={scss.errorState}>Не удалось загрузить данные. Попробуйте обновить страницу.</div>
+      )}
+
       <StatsCards stats={stats} loading={loading} />
       <RevenueChart data={chartData} loading={loading} />
 
-      {!loading && filteredOrders.length === 0 && (
+      {!loading && !isError && filteredOrders.length === 0 && (
         <div className={scss.emptyState}>Нет заказов за выбранный период</div>
       )}
 

@@ -7,6 +7,7 @@ import scss from "./MyProducts.module.scss";
 import UpdateModal from "@/src/ui/card-buttons/updateModal/UpdateModal";
 import ProductCard from "@/src/components/product/ProductCard";
 import { useGetCommodityMyProducts } from "@/src/api/generated/endpoints/product/product";
+import { useGetCategoryCategoriesTree } from "@/src/api/generated/endpoints/category/category";
 
 type Status = "all" | "in_stock" | "low_stock" | "out_of_stock";
 type Sort   = "newest" | "oldest" | "price_high" | "price_low" | "popular";
@@ -28,18 +29,49 @@ const SORT_OPTS: { value: Sort; label: string }[] = [
 
 const smooth: [number,number,number,number] = [0.22, 1, 0.36, 1];
 
+// Flatten category tree → id→name map
+function flattenTree(nodes: any[]): Map<number, string> {
+  const map = new Map<number, string>();
+  const walk = (list: any[]) => {
+    for (const n of list) {
+      map.set(n.id, n.name);
+      if (n.children?.length) walk(n.children);
+    }
+  };
+  walk(nodes);
+  return map;
+}
+
 const MyProducts: FC = () => {
   const router  = useRouter();
   const reduce  = useReducedMotion() ?? false;
-  const { data, isLoading } = useGetCommodityMyProducts();
+  const { data, isLoading }             = useGetCommodityMyProducts();
+  const { data: catData }               = useGetCategoryCategoriesTree();
 
   const [search,            setSearch]            = useState("");
   const [status,            setStatus]            = useState<Status>("all");
   const [sort,              setSort]              = useState<Sort>("newest");
+  const [categoryId,        setCategoryId]        = useState<number | null>(null);
   const [editingProductId,  setEditingProductId]  = useState<number | null>(null);
   const [sortOpen,          setSortOpen]          = useState(false);
 
-  const products = data?.products ?? [];
+  const products   = data?.products ?? [];
+  const categoryMap = useMemo(
+    () => flattenTree(catData?.categories ?? []),
+    [catData]
+  );
+
+  // Only show categories that actually appear in the seller's products
+  const usedCategories = useMemo(() => {
+    const seen = new Map<number, number>(); // id → count
+    for (const p of products as any[]) {
+      const cid = p.categoryId;
+      if (cid) seen.set(cid, (seen.get(cid) ?? 0) + 1);
+    }
+    return Array.from(seen.entries())
+      .map(([id, count]) => ({ id, name: categoryMap.get(id) ?? `#${id}`, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [products, categoryMap]);
 
   const filtered = useMemo(() => {
     let list = [...products] as any[];
@@ -63,6 +95,10 @@ const MyProducts: FC = () => {
       });
     }
 
+    if (categoryId !== null) {
+      list = list.filter((p) => p.categoryId === categoryId);
+    }
+
     list.sort((a, b) => {
       if (sort === "newest")     return (b.id ?? 0) - (a.id ?? 0);
       if (sort === "oldest")     return (a.id ?? 0) - (b.id ?? 0);
@@ -73,7 +109,7 @@ const MyProducts: FC = () => {
     });
 
     return list;
-  }, [products, search, status, sort]);
+  }, [products, search, status, sort, categoryId]);
 
   const currentSortLabel = SORT_OPTS.find((o) => o.value === sort)?.label ?? "Сортировка";
 
@@ -187,9 +223,39 @@ const MyProducts: FC = () => {
         </div>
       </motion.div>
 
+      {/* ── Category filter ────────────────────────────── */}
+      {usedCategories.length > 1 && (
+        <motion.div
+          className={scss.categoryBar}
+          initial={reduce ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.18, ease: smooth }}
+        >
+          <motion.button
+            className={`${scss.catPill} ${categoryId === null ? scss.catPillActive : ""}`}
+            onClick={() => setCategoryId(null)}
+            whileTap={reduce ? undefined : { scale: 0.94 }}
+          >
+            Все категории
+            <span className={scss.pillCount}>{products.length}</span>
+          </motion.button>
+          {usedCategories.map(({ id, name, count }) => (
+            <motion.button
+              key={id}
+              className={`${scss.catPill} ${categoryId === id ? scss.catPillActive : ""}`}
+              onClick={() => setCategoryId(categoryId === id ? null : id)}
+              whileTap={reduce ? undefined : { scale: 0.94 }}
+            >
+              {name}
+              <span className={scss.pillCount}>{count}</span>
+            </motion.button>
+          ))}
+        </motion.div>
+      )}
+
       {/* ── Results count ──────────────────────────────── */}
       <AnimatePresence>
-        {(search || status !== "all") && (
+        {(search || status !== "all" || categoryId !== null) && (
           <motion.div
             className={scss.resultsLine}
             initial={{ opacity: 0, height: 0 }}
@@ -198,7 +264,7 @@ const MyProducts: FC = () => {
             transition={{ duration: 0.2 }}
           >
             Найдено: <strong>{filtered.length}</strong>
-            <button className={scss.resetBtn} onClick={() => { setSearch(""); setStatus("all"); }}>
+            <button className={scss.resetBtn} onClick={() => { setSearch(""); setStatus("all"); setCategoryId(null); }}>
               Сбросить
             </button>
           </motion.div>

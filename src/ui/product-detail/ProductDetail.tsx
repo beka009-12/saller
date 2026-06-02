@@ -1,222 +1,330 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import {
+  ArrowLeft, Edit2, Package, Tag, Eye, TrendingUp,
+  CheckCircle, XCircle, Archive,
+} from "lucide-react";
 import { useGetCommodityProductOwnerId } from "@/src/api/generated/endpoints/product/product";
-import scss from "./ProductDetail.module.scss";
-import { useState, useEffect, useRef } from "react";
 import UpdateModal from "../card-buttons/updateModal/UpdateModal";
+import { hexByName } from "@/src/lib/colors";
+import scss from "./ProductDetail.module.scss";
 
-interface ProductDetailProps {
-  id: number;
-}
+interface ProductDetailProps { id: number }
 
+const smooth: [number,number,number,number] = [0.22, 1, 0.36, 1];
+
+const GENDER_LABEL: Record<string, string> = {
+  MALE: "Мужской", FEMALE: "Женский", UNISEX: "Унисекс",
+};
+const SEASON_LABEL: Record<string, string> = {
+  SPRING_SUMMER: "Весна / Лето",
+  AUTUMN_WINTER: "Осень / Зима",
+  ALL_SEASON: "Всесезонный",
+};
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+const Skeleton = () => (
+  <div className={scss.skeleton}>
+    <div className={scss.skelGallery} />
+    <div className={scss.skelInfo}>
+      {[100, 60, 80, 40, 90, 50].map((w, i) => (
+        <div key={i} className={scss.skelLine} style={{ width: `${w}%` }} />
+      ))}
+    </div>
+  </div>
+);
+
+// ── Main component ─────────────────────────────────────────────────────────────
 const ProductDetail = ({ id }: ProductDetailProps) => {
-  const router = useRouter();
+  const router  = useRouter();
+  const reduce  = useReducedMotion() ?? false;
   const { data, isLoading } = useGetCommodityProductOwnerId(id);
 
-  // Достаем product из даты (зависит от того, как возвращает ваш хук)
-  const product = data?.product;
+  const [activeImg,   setActiveImg]   = useState(0);
+  const [modalOpen,   setModalOpen]   = useState(false);
+  const [imgKey,      setImgKey]      = useState(0);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  if (isLoading) return <Skeleton />;
 
-  const menuRef = useRef<HTMLDivElement>(null);
+  const product = data?.product as any;
+  if (!product) return (
+    <div className={scss.notFound}>
+      <Package size={40} />
+      <p>Товар не найден</p>
+      <button onClick={() => router.back()} className={scss.backBtn}>← Назад</button>
+    </div>
+  );
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const images: string[]       = product.images ?? [];
+  const price                  = Number(product.price ?? 0);
+  const newPrice               = product.newPrice ? Number(product.newPrice) : null;
+  const hasDiscount            = newPrice !== null && newPrice < price;
+  const actualPrice            = hasDiscount ? newPrice! : price;
+  const discountPct            = hasDiscount ? Math.round((1 - newPrice! / price) * 100) : null;
+  const colors: string[]       = product.colors ?? [];
+  const sizes: string[]        = product.sizes ?? [];
 
-  if (isLoading) return <div className={scss.loader}>Загрузка...</div>;
-  if (!product) return <div className={scss.error}>Товар не найден</div>;
+  const selectImage = (i: number) => {
+    setActiveImg(i);
+    setImgKey((k) => k + 1);
+  };
 
-  // ЛОГИКА СКИДКИ:
-  // price — это старая/базовая цена
-  // newPrice — это текущая цена со скидкой
-  const hasDiscount = !!product.newPrice;
-  const actualPrice = hasDiscount
-    ? Number(product.newPrice)
-    : Number(product.price);
-  const oldPriceValue = hasDiscount ? Number(product.price) : null;
-
-  const discountPercent =
-    hasDiscount && oldPriceValue
-      ? Math.round(100 - (actualPrice / oldPriceValue) * 100)
-      : null;
+  const fmtPrice = (n: number) =>
+    new Intl.NumberFormat("ru-KG", { style: "currency", currency: "KGS", maximumFractionDigits: 0 }).format(n);
 
   return (
-    <section className={scss.ProductDetail}>
-      <div className="container">
-        <div className={scss.content}>
-          {/* Левая колонка: Галерея */}
-          <div className={scss.gallery}>
-            {((product as any).images?.length ?? 0) > 1 && (
-              <div className={scss.thumbs}>
-                {(product as any).images.map((img: string, i: number) => (
-                  <img
-                    key={i}
-                    src={img}
-                    alt={`Preview ${i}`}
-                    className={`${scss.thumb} ${
-                      selectedImageIndex === i ? scss.activeThumb : ""
-                    }`}
-                    onClick={() => setSelectedImageIndex(i)}
-                  />
-                ))}
-              </div>
+    <div className={scss.page}>
+
+      {/* ── Top bar ────────────────────────────────────── */}
+      <motion.div
+        className={scss.topBar}
+        initial={reduce ? false : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: smooth }}
+      >
+        <motion.button
+          className={scss.backBtn}
+          onClick={() => router.back()}
+          whileHover={{ x: -3, transition: { duration: 0.15 } }}
+          whileTap={reduce ? undefined : { scale: 0.95 }}
+        >
+          <ArrowLeft size={15} />
+          Назад
+        </motion.button>
+
+        <div className={scss.topActions}>
+          <motion.button
+            className={scss.editBtn}
+            onClick={() => setModalOpen(true)}
+            whileHover={{ scale: 1.03, transition: { duration: 0.15 } }}
+            whileTap={reduce ? undefined : { scale: 0.96 }}
+          >
+            <Edit2 size={14} />
+            Редактировать
+          </motion.button>
+        </div>
+      </motion.div>
+
+      {/* ── Layout ─────────────────────────────────────── */}
+      <div className={scss.layout}>
+
+        {/* ── Gallery ──────────────────────────────────── */}
+        <motion.div
+          className={scss.gallery}
+          initial={reduce ? false : { opacity: 0, x: -24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45, ease: smooth }}
+        >
+          {/* Main image */}
+          <div className={scss.mainImgWrap}>
+            <AnimatePresence mode="wait">
+              {images.length > 0 ? (
+                <motion.img
+                  key={imgKey}
+                  src={images[activeImg]}
+                  alt={product.title}
+                  className={scss.mainImg}
+                  initial={reduce ? false : { opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: smooth }}
+                />
+              ) : (
+                <div className={scss.noImg}>
+                  <Package size={48} />
+                </div>
+              )}
+            </AnimatePresence>
+
+            {/* Status overlay */}
+            <div className={`${scss.statusOverlay} ${product.isActive ? scss.statusActive : scss.statusInactive}`}>
+              {product.isActive
+                ? <><CheckCircle size={12} /> Активен</>
+                : <><XCircle size={12} /> Неактивен</>
+              }
+            </div>
+
+            {/* Discount badge */}
+            {hasDiscount && discountPct && (
+              <div className={scss.discountOverlay}>−{discountPct}%</div>
             )}
-            <img
-              src={(product as any).images?.[selectedImageIndex] || "/placeholder.png"}
-              alt={product.title}
-              className={scss.mainImage}
-            />
+
+            {/* Image counter */}
+            {images.length > 1 && (
+              <div className={scss.imgCounter}>{activeImg + 1} / {images.length}</div>
+            )}
           </div>
 
-          {/* Правая колонка: Инфо */}
-          <div className={scss.info}>
-            <div className={scss.badges}>
-              <div className={scss.ded}>
-                <span className={scss.categoryBadge}>
-                  {product.categoryId
-                    ? `Категория: ${product.categoryId}`
-                    : "Без категории"}
-                </span>
-                <span
-                  className={product.isActive ? scss.active : scss.inactive}
+          {/* Thumbnails */}
+          {images.length > 1 && (
+            <div className={scss.thumbs}>
+              {images.map((src, i) => (
+                <motion.button
+                  key={i}
+                  className={`${scss.thumb} ${i === activeImg ? scss.thumbActive : ""}`}
+                  onClick={() => selectImage(i)}
+                  whileHover={reduce ? undefined : { scale: 1.06 }}
+                  whileTap={reduce ? undefined : { scale: 0.94 }}
                 >
-                  {product.isActive ? "Активен" : "Неактивен"}
-                </span>
+                  <img src={src} alt="" />
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* ── Info panel ───────────────────────────────── */}
+        <motion.div
+          className={scss.info}
+          initial={reduce ? false : { opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45, delay: 0.08, ease: smooth }}
+        >
+          {/* Meta badges */}
+          <div className={scss.metaBadges}>
+            {product.category?.name && (
+              <span className={scss.badge}>{product.category.name}</span>
+            )}
+            {product.brandName && (
+              <span className={scss.badgeAccent}>{product.brandName}</span>
+            )}
+            {product.gender && (
+              <span className={scss.badge}>{GENDER_LABEL[product.gender] ?? product.gender}</span>
+            )}
+            {product.season && (
+              <span className={scss.badge}>{SEASON_LABEL[product.season] ?? product.season}</span>
+            )}
+          </div>
+
+          {/* Title */}
+          <div className={scss.titleBlock}>
+            <h1>{product.title}</h1>
+            {product.sku && (
+              <span className={scss.sku}>SKU: {product.sku}</span>
+            )}
+          </div>
+
+          {/* Price */}
+          <div className={scss.priceBlock}>
+            <div className={scss.priceMain}>
+              <span className={scss.actualPrice}>{fmtPrice(actualPrice)}</span>
+              {hasDiscount && (
+                <span className={scss.oldPrice}>{fmtPrice(price)}</span>
+              )}
+            </div>
+            {hasDiscount && discountPct && (
+              <span className={scss.discountBadge}>
+                <Tag size={11} />
+                −{discountPct}%
+              </span>
+            )}
+          </div>
+
+          {/* Quick stats */}
+          <motion.div
+            className={scss.quickStats}
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
+          >
+            {[
+              { label: "В наличии", value: `${product.stockCount ?? 0} шт`, icon: Package,    warn: (product.stockCount ?? 0) <= 5 },
+              { label: "Продано",   value: `${product.soldCount  ?? 0} шт`, icon: TrendingUp, warn: false },
+              { label: "Просмотры", value: String(product.views  ?? 0),     icon: Eye,         warn: false },
+            ].map(({ label, value, icon: Icon, warn }) => (
+              <motion.div
+                key={label}
+                className={`${scss.statCard} ${warn ? scss.statCardWarn : ""}`}
+                variants={{
+                  hidden:  { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: smooth } },
+                }}
+              >
+                <Icon size={14} className={scss.statIcon} />
+                <span className={scss.statValue}>{value}</span>
+                <span className={scss.statLabel}>{label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Colors */}
+          {colors.length > 0 && (
+            <div className={scss.section}>
+              <div className={scss.sectionLabel}>Цвета</div>
+              <div className={scss.colorRow}>
+                {colors.map((name) => (
+                  <div key={name} className={scss.colorChip}>
+                    <span
+                      className={scss.colorDot}
+                      style={{ background: hexByName(name) }}
+                    />
+                    {name}
+                  </div>
+                ))}
               </div>
+            </div>
+          )}
 
-              <div className={scss.menuWrapper} ref={menuRef}>
-                <button
-                  className={scss.burgerBtn}
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                >
-                  ⋮
-                </button>
+          {/* Sizes */}
+          {sizes.length > 0 && (
+            <div className={scss.section}>
+              <div className={scss.sectionLabel}>Размеры</div>
+              <div className={scss.sizeRow}>
+                {sizes.map((s) => (
+                  <span key={s} className={scss.sizeChip}>{s}</span>
+                ))}
+              </div>
+            </div>
+          )}
 
-                {isMenuOpen && (
-                  <div className={scss.dropdownMenu}>
-                    <button
-                      className={scss.menuItem}
-                      onClick={() => {
-                        setIsModalOpen(true);
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      <span>🖊</span> Изменить
-                    </button>
-                    <button
-                      className={scss.menuItem}
-                      onClick={() => router.back()}
-                    >
-                      <span>✕</span> Назад
-                    </button>
+          {/* Attributes */}
+          {(product.material || product.sku) && (
+            <div className={scss.section}>
+              <div className={scss.sectionLabel}>Характеристики</div>
+              <div className={scss.attrList}>
+                {product.material && (
+                  <div className={scss.attrRow}>
+                    <span>Материал</span>
+                    <span>{product.material}</span>
+                  </div>
+                )}
+                {product.sku && (
+                  <div className={scss.attrRow}>
+                    <span>SKU</span>
+                    <span className={scss.mono}>{product.sku}</span>
                   </div>
                 )}
               </div>
             </div>
+          )}
 
-            <div className={scss.titleBlock}>
-              <h1 className={scss.title}>{product.title}</h1>
+          {/* Description */}
+          {product.description && (
+            <div className={scss.section}>
+              <div className={scss.sectionLabel}>Описание</div>
               <p className={scss.description}>{product.description}</p>
             </div>
+          )}
 
-            <div className={scss.priceBox}>
-              <div className={scss.priceMain}>
-                <span className={scss.label}>Цена</span>
-                <div className={scss.priceRow}>
-                  {/* Основная актуальная цена */}
-                  <span className={scss.price}>
-                    {actualPrice.toLocaleString()} <span>сом</span>
-                  </span>
-
-                  {/* Старая зачеркнутая цена, если есть скидка */}
-                  {hasDiscount && (
-                    <span className={scss.oldPrice}>
-                      {oldPriceValue?.toLocaleString()} сом
-                    </span>
-                  )}
-                </div>
-              </div>
-              {/* Бейдж процента скидки */}
-              {discountPercent && discountPercent > 0 && (
-                <span className={scss.discount}>−{discountPercent}%</span>
-              )}
+          {/* Archived */}
+          {product.archivedAt && (
+            <div className={scss.archivedBanner}>
+              <Archive size={14} />
+              Архивировано {new Date(product.archivedAt).toLocaleDateString("ru-RU")}
             </div>
-
-            <div className={scss.stats}>
-              <div className={scss.statItem}>
-                <span>В наличии</span>
-                <span>{product.stockCount} шт</span>
-              </div>
-              {product.brandName && (
-                <div className={scss.statItem}>
-                  <span>Бренд</span>
-                  <span>{product.brandName}</span>
-                </div>
-              )}
-
-              <div className={scss.statItem}>
-                <span>Размер</span>
-                <span>{product.sizes?.join(", ") || "Не указан"}</span>
-              </div>
-              <div className={scss.statItem}>
-                <span>Цвет</span>
-                <span>{product.colors?.join(", ") || "Не указан"}</span>
-              </div>
-
-              {product.material && (
-                <div className={scss.statItem}>
-                  <span>Материал</span>
-                  <span>{product.material}</span>
-                </div>
-              )}
-
-              {product.gender && (
-                <div className={scss.statItem}>
-                  <span>Пол</span>
-                  <span>{product.gender}</span>
-                </div>
-              )}
-
-              {product.season && (
-                <div className={scss.statItem}>
-                  <span>Сезон</span>
-                  <span>{product.season}</span>
-                </div>
-              )}
-
-              {product.sku && (
-                <div className={scss.statItem}>
-                  <span>Коллекция</span>
-                  <span>{product.sku}</span>
-                </div>
-              )}
-            </div>
-
-            {(product as any).archivedAt && (
-              <div className={scss.archived}>
-                Архивировано:{" "}
-                {new Date((product as any).archivedAt).toLocaleDateString("ru-RU")}
-              </div>
-            )}
-          </div>
-        </div>
+          )}
+        </motion.div>
       </div>
 
-      {isModalOpen && (
-        <UpdateModal productId={id} onClose={() => setIsModalOpen(false)} />
+      {/* ── Modal ──────────────────────────────────────── */}
+      {modalOpen && (
+        <UpdateModal productId={id} onClose={() => setModalOpen(false)} />
       )}
-    </section>
+    </div>
   );
 };
 

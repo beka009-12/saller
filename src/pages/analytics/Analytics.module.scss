@@ -1,0 +1,114 @@
+.page {
+  padding: 36px 40px 64px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-0);
+    margin: 0;
+  }
+}
+
+.periodSwitcher {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  padding: 3px;
+}
+
+.periodBtn {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: calc(var(--r-md) - 2px);
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-2);
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    color: var(--text-0);
+  }
+
+  &.active {
+    background: var(--accent);
+    color: #fff;
+  }
+}
+
+.emptyState {
+  padding: 48px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.lowStockCard {
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  padding: 20px;
+}
+
+.lowStockHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-0);
+  margin-bottom: 16px;
+}
+
+.stockRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-strong);
+  font-size: 13px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.stockName {
+  color: var(--text-0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+}
+
+.stockBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+
+  &.critical {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+  }
+
+  &.warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+  }
+}

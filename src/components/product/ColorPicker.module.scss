@@ -1,0 +1,135 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ── Palette ───────────────────────────────────────────────────────────────────
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  outline: none;
+
+  // ring for white swatch
+  box-shadow: 0 0 0 1px var(--border-strong);
+
+  &:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  &.swatchSelected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent);
+    transform: scale(1.1);
+  }
+}
+
+.checkmark {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+// ── Custom input ──────────────────────────────────────────────────────────────
+.customRow {
+  display: flex;
+  gap: 6px;
+}
+
+.customInput {
+  flex: 1;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--bg-1);
+  font-size: 13px;
+  color: var(--text-0);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.15s;
+
+  &::placeholder { color: var(--text-2); }
+  &:focus { border-color: var(--accent); }
+}
+
+.addBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-3);
+  font-size: 18px;
+  color: var(--text-1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.14s, color 0.14s;
+  flex-shrink: 0;
+
+  &:hover { background: var(--accent-dim); color: var(--accent); }
+}
+
+// ── Pills ─────────────────────────────────────────────────────────────────────
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 6px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-0);
+}
+
+.pillDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.pillRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-2);
+  padding: 0;
+  margin-left: 1px;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { background: var(--red-dim); color: var(--red); }
+}

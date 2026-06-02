@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -15,23 +15,36 @@
   border: 1px solid var(--border-strong);
   border-radius: var(--r-lg);
   width: 100%;
-  max-width: 640px;
-  padding: 24px;
-  max-height: 90vh;
+  max-width: 680px;
+  max-height: 92vh;
   overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
+// ── Header ────────────────────────────────────────────────────────────────────
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-strong);
+  position: sticky;
+  top: 0;
+  background: var(--bg-2);
+  z-index: 1;
 
   h3 {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-0);
+    margin: 0 0 2px;
+  }
+
+  p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-2);
     margin: 0;
   }
 }
@@ -47,119 +60,180 @@
   border-radius: var(--r-sm);
   cursor: pointer;
   color: var(--text-1);
+  flex-shrink: 0;
   transition: background 0.14s, color 0.14s;
 
-  &:hover { background: var(--bg-4); color: var(--text-0); }
+  &:hover { background: var(--red-dim); color: var(--red); }
 }
 
+.loading {
+  padding: 48px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+// ── Form ──────────────────────────────────────────────────────────────────────
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  padding: 0 0 8px;
 }
 
+// ── Section ───────────────────────────────────────────────────────────────────
+.section {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &:last-of-type { border-bottom: none; }
+}
+
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-2);
+}
+
+.hint {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-2);
+  opacity: 0.7;
+}
+
+// ── Fields ────────────────────────────────────────────────────────────────────
 .field {
   display: flex;
   flex-direction: column;
   gap: 5px;
 
   label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-2);
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
-  input, textarea {
+  input, textarea, select {
     padding: 9px 12px;
     border: 1px solid var(--border-strong);
     border-radius: var(--r-sm);
-    background: var(--bg-3);
+    background: var(--bg-1);
     font-size: 13px;
     color: var(--text-0);
+    font-family: var(--font-sans);
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.14s;
+    transition: border-color 0.14s, box-shadow 0.14s;
 
     &::placeholder { color: var(--text-2); }
-    &:focus { border-color: var(--border-accent); }
+
+    &:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
   }
 
-  textarea { resize: vertical; min-height: 80px; }
+  textarea { resize: vertical; min-height: 72px; }
+
+  select { cursor: pointer; }
 }
 
+.inputError { border-color: var(--red) !important; }
+
+.errorMsg {
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 2px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  @media (max-width: 540px) { grid-template-columns: 1fr; }
+}
+
+// ── Images ────────────────────────────────────────────────────────────────────
 .images {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
-
-  &::-webkit-scrollbar { height: 3px; }
-  &::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 2px; }
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-4) transparent;
 }
 
 .image {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   flex-shrink: 0;
   border: 1px solid var(--border-strong);
 }
 
 .uploadBtn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 7px;
   padding: 9px 14px;
   border: 1px dashed var(--border-strong);
   border-radius: var(--r-sm);
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-2);
   cursor: pointer;
+  width: fit-content;
   transition: border-color 0.14s, color 0.14s;
 
-  &:hover { border-color: var(--border-accent); color: var(--accent); }
+  &:hover { border-color: var(--accent); color: var(--accent); }
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
-}
-
+// ── Actions ───────────────────────────────────────────────────────────────────
 .buttons {
   display: flex;
   gap: 10px;
-  margin-top: 6px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border-strong);
+}
 
-  button {
-    flex: 1;
-    padding: 10px;
-    border-radius: var(--r-sm);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid var(--border-strong);
+.cancelBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-3);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
 
-    &[type='button'] {
-      background: var(--bg-3);
-      color: var(--text-1);
-      &:hover { background: var(--bg-4); color: var(--text-0); }
-    }
+  &:hover { background: var(--bg-4); color: var(--text-0); }
+}
 
-    &[type='submit'] {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #000;
-      &:hover { opacity: 0.85; }
-      &:disabled { opacity: 0.5; cursor: not-allowed; }
-    }
-  }
+.saveBtn {
+  flex: 2;
+  padding: 10px;
+  border-radius: var(--r-md);
+  border: none;
+  background: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--accent-glow);
+  transition: opacity 0.14s;
+
+  &:hover { opacity: 0.88; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }

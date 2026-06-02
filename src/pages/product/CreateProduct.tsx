@@ -3,6 +3,8 @@ import { type FC, useState, useRef, useEffect, useMemo } from "react";
 import scss from "./CreateProduct.module.scss";
 import { useGetCategoryCategoriesTree } from "@/src/api/generated/endpoints/category/category";
 import { usePostCommodityCreateProduct } from "@/src/api/generated/endpoints/product/product";
+import ColorPicker from "@/src/components/product/ColorPicker";
+import SizePicker from "@/src/components/product/SizePicker";
 import toast from "react-hot-toast";
 
 type Gender = "MALE" | "FEMALE" | "UNISEX";
@@ -209,279 +211,69 @@ const Step2Info: FC<{
 };
 
 // ─── Step 3: Attributes ───────────────────────────────────────────────────────
-const SIZE_HINTS = ["S", "M", "L", "XL", "XXL", "36", "38", "40", "42", "44"];
+const GENDER_OPTIONS = [
+  { value: "MALE",   label: "Мужской" },
+  { value: "FEMALE", label: "Женский" },
+  { value: "UNISEX", label: "Унисекс" },
+] as const;
+
+const SEASON_OPTIONS = [
+  { value: "SPRING_SUMMER", label: "Весна / Лето" },
+  { value: "AUTUMN_WINTER", label: "Осень / Зима" },
+  { value: "ALL_SEASON",    label: "Всесезонный" },
+] as const;
 
 const Step3Attributes: FC<{
   data: FormState;
   onChange: (key: keyof FormState, value: unknown) => void;
-}> = ({ data, onChange }) => {
-  const [sizeInput, setSizeInput] = useState("");
-  const [colorPicker, setColorPicker] = useState("#000000");
-  const [colorHex, setColorHex] = useState("#000000");
-  const [hexError, setHexError] = useState<string | null>(null);
+}> = ({ data, onChange }) => (
+  <div className={scss.step}>
+    <h2 className={scss.stepTitle}>Характеристики</h2>
 
-  const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-    { value: "MALE", label: "Мужской" },
-    { value: "FEMALE", label: "Женский" },
-    { value: "UNISEX", label: "Унисекс" },
-  ];
+    <div className={scss.field}>
+      <label>Размеры *</label>
+      <SizePicker
+        value={data.sizes}
+        onChange={(v) => onChange("sizes", v)}
+      />
+    </div>
 
-  const SEASON_OPTIONS: { value: Season; label: string }[] = [
-    { value: "SPRING_SUMMER", label: "Весна / Лето" },
-    { value: "AUTUMN_WINTER", label: "Осень / Зима" },
-    { value: "ALL_SEASON", label: "Всесезонный" },
-  ];
+    <div className={scss.field}>
+      <label>Цвета * <span className={scss.fieldHint}>(выберите из палитры или введите название)</span></label>
+      <ColorPicker
+        value={data.colors}
+        onChange={(v) => onChange("colors", v)}
+      />
+    </div>
 
-  const addSize = (value: string) => {
-    const trimmed = value.trim();
-    if (trimmed && !data.sizes.includes(trimmed)) {
-      onChange("sizes", [...data.sizes, trimmed]);
-    }
-  };
+    <div className={scss.field}>
+      <label>Материал</label>
+      <input
+        type="text"
+        placeholder="Кожа, текстиль, хлопок…"
+        value={data.material || ""}
+        onChange={(e) => onChange("material", e.target.value)}
+      />
+    </div>
 
-  const handleSizeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addSize(sizeInput);
-      setSizeInput("");
-    }
-  };
-
-  const COLOR_PRESETS = [
-    { hex: "#000000", label: "Чёрный" },
-    { hex: "#ffffff", label: "Белый" },
-    { hex: "#f5f0e8", label: "Бежевый" },
-    { hex: "#808080", label: "Серый" },
-    { hex: "#c41e3a", label: "Красный" },
-    { hex: "#001f5b", label: "Navy" },
-    { hex: "#3b82f6", label: "Синий" },
-    { hex: "#22c55e", label: "Зелёный" },
-    { hex: "#f97316", label: "Оранжевый" },
-    { hex: "#a855f7", label: "Фиолетовый" },
-  ];
-
-  const normalizeHex = (input: string): string | null => {
-    const trimmed = input.trim();
-    const rgbMatch = trimmed.match(
-      /^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
-    );
-    if (rgbMatch) {
-      const clamp = (n: number) => Math.max(0, Math.min(255, n));
-      const r = clamp(parseInt(rgbMatch[1])).toString(16).padStart(2, "0");
-      const g = clamp(parseInt(rgbMatch[2])).toString(16).padStart(2, "0");
-      const b = clamp(parseInt(rgbMatch[3])).toString(16).padStart(2, "0");
-      return `#${r}${g}${b}`;
-    }
-    const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
-    if (/^#[0-9a-fA-F]{3}$/.test(withHash)) {
-      const [, r, g, b] = withHash.split("");
-      return (`#${r}${r}${g}${g}${b}${b}`).toLowerCase();
-    }
-    if (/^#[0-9a-fA-F]{6}$/.test(withHash)) {
-      return withHash.toLowerCase();
-    }
-    return null;
-  };
-
-  const addColor = () => {
-    const hex = normalizeHex(colorHex);
-    if (!hex) {
-      setHexError("Неверный формат. Пример: #3B82F6 или rgb(59,130,246)");
-      return;
-    }
-    if (data.colors.includes(hex)) {
-      setHexError("Этот цвет уже добавлен");
-      return;
-    }
-    setHexError(null);
-    onChange("colors", [...data.colors, hex]);
-    setColorPicker("#000000");
-    setColorHex("#000000");
-  };
-
-  return (
-    <div className={scss.step}>
-      <h2 className={scss.stepTitle}>Характеристики</h2>
-
-      {/* ── Sizes ── */}
+    <div className={scss.fieldRow}>
       <div className={scss.field}>
-        <label>Размеры *</label>
-        <div className={scss.tagInput}>
-          <input
-            type="text"
-            placeholder="Например: 38, M, XL..."
-            value={sizeInput}
-            onChange={(e) => setSizeInput(e.target.value)}
-            onKeyDown={handleSizeKeyDown}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              addSize(sizeInput);
-              setSizeInput("");
-            }}
-          >
-            +
-          </button>
-        </div>
-        {data.sizes.length > 0 && (
-          <div className={scss.tags}>
-            {data.sizes.map((s) => (
-              <span key={s} className={scss.tag}>
-                {s}
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange(
-                      "sizes",
-                      data.sizes.filter((x) => x !== s)
-                    )
-                  }
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-        <div className={scss.sizeHints}>
-          {SIZE_HINTS.filter((h) => !data.sizes.includes(h)).map((hint) => (
-            <button
-              key={hint}
-              type="button"
-              className={scss.sizeHint}
-              onClick={() => onChange("sizes", [...data.sizes, hint])}
-            >
-              {hint}
-            </button>
-          ))}
-        </div>
+        <label>Пол</label>
+        <select value={data.gender} onChange={(e) => onChange("gender", e.target.value)}>
+          <option value="">— Не указан —</option>
+          {GENDER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
       </div>
-
-      {/* ── Colors ── */}
       <div className={scss.field}>
-        <label>Цвета *</label>
-
-        {/* Preset swatches — only show unselected ones */}
-        <div className={scss.colorPresets}>
-          {COLOR_PRESETS.filter(({ hex }) => !data.colors.includes(hex)).map(
-            ({ hex, label }) => (
-              <button
-                key={hex}
-                type="button"
-                title={label}
-                className={scss.colorPreset}
-                style={{ background: hex }}
-                onClick={() => onChange("colors", [...data.colors, hex])}
-              />
-            )
-          )}
-        </div>
-
-        {/* Picker row */}
-        <div className={scss.colorPickerRow}>
-          <input
-            type="color"
-            value={colorPicker}
-            className={scss.colorSwatch}
-            onChange={(e) => {
-              setColorPicker(e.target.value);
-              setColorHex(e.target.value);
-            }}
-          />
-          <input
-            type="text"
-            placeholder="#000000 или rgb(0,0,0)"
-            value={colorHex}
-            className={hexError ? scss.inputError : ""}
-            onChange={(e) => {
-              setColorHex(e.target.value);
-              const hex = normalizeHex(e.target.value);
-              if (hex) {
-                setColorPicker(hex);
-                setHexError(null);
-              } else {
-                setHexError(null);
-              }
-            }}
-            onKeyDown={(e) => e.key === "Enter" && addColor()}
-          />
-          <button type="button" className={scss.btnAddColor} onClick={addColor}>
-            Добавить
-          </button>
-        </div>
-        {hexError && <span className={scss.errorMsg}>{hexError}</span>}
-
-        {/* Tags */}
-        {data.colors.length > 0 && (
-          <div className={scss.tags}>
-            {data.colors.map((c) => (
-              <span key={c} className={scss.tag}>
-                <span className={scss.colorDot} style={{ background: c }} />
-                {c}
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange(
-                      "colors",
-                      data.colors.filter((x) => x !== c)
-                    )
-                  }
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className={scss.fieldRow}>
-        <div className={scss.field}>
-          <label>Материал</label>
-          <input
-            type="text"
-            placeholder="Кожа, Текстиль, Хлопок..."
-            value={data.material || ""}
-            onChange={(e) => onChange("material", e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className={scss.fieldRow}>
-        <div className={scss.field}>
-          <label>Пол</label>
-          <select
-            value={data.gender}
-            onChange={(e) => onChange("gender", e.target.value)}
-          >
-            <option value="">— Не указан —</option>
-            {GENDER_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className={scss.field}>
-          <label>Сезон</label>
-          <select
-            value={data.season}
-            onChange={(e) => onChange("season", e.target.value)}
-          >
-            <option value="">— Не указан —</option>
-            {SEASON_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <label>Сезон</label>
+        <select value={data.season} onChange={(e) => onChange("season", e.target.value)}>
+          <option value="">— Не указан —</option>
+          {SEASON_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
       </div>
     </div>
-  );
-};
+  </div>
+);
 // ─── Step 4: Category ─────────────────────────────────────────────────────────
 const Step4Category: FC<{
   categoryId: number | null;

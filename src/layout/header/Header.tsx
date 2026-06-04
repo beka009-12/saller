@@ -1,14 +1,15 @@
 "use client";
 import { useState, useEffect, type FC } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import scss from "./Header.module.scss";
 import { useCurrentSeller } from "../../hooks/use-current-seller";
 import {
   LayoutDashboard, Package, ShoppingBag, Megaphone,
-  Settings, LogOut, User, Store, Menu, X,
-  ChevronRight, Zap, BarChart2, Sun, Moon,
+  Settings, LogOut, Menu, X, Zap, BarChart2, Sun, Moon,
 } from "lucide-react";
 import { useTheme } from "@/src/hooks/use-theme";
+import { motionTokens, springs } from "@/src/lib/motion-tokens";
 
 const NAV = [
   { label: "Дашборд",   path: "/",          icon: LayoutDashboard },
@@ -19,12 +20,26 @@ const NAV = [
   { label: "Настройки", path: "/settings",   icon: Settings },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.055, delayChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden:  { opacity: 0, x: -motionTokens.distance.sm },
+  visible: { opacity: 1, x: 0, transition: { ...springs.gentle } },
+};
+
 const Header: FC = () => {
   const router   = useRouter();
   const pathname = usePathname();
+  const reduce   = useReducedMotion() ?? false;
   const { data: seller, isLoading, isError } = useCurrentSeller();
-  const [mobile, setMobile] = useState(false);
+  const [mobile,   setMobile]   = useState(false);
+  const [mounted,  setMounted]  = useState(false);
   const { isDark, toggle: toggleTheme } = useTheme();
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!isLoading && (!seller || isError)) router.replace("/register");
@@ -45,13 +60,15 @@ const Header: FC = () => {
     setMobile(false);
   };
 
-  const shop  = (seller?.user?.stores?.[0] as any);
-  const name  = seller?.user?.name || "Продавец";
-  const email = seller?.user?.email || "";
+  const shop     = (seller?.user?.stores?.[0] as any);
+  const name     = seller?.user?.name  || "Продавец";
+  const email    = seller?.user?.email || "";
   const initials = name.slice(0, 2).toUpperCase();
 
   const isActive = (path: string) =>
     path === "/" ? pathname === "/" : (pathname ?? "").startsWith(path);
+
+  const shouldAnimate = mounted && !reduce;
 
   return (
     <>
@@ -67,72 +84,153 @@ const Header: FC = () => {
         <div className={scss.topAvatar}>{initials}</div>
       </div>
 
-      {/* ─── Desktop sidebar ────────────────────────────────── */}
+      {/* ─── Desktop sidebar ───────────────────────────────── */}
       <aside className={scss.sidebar}>
         <div className={scss.sideInner}>
-          {/* Logo */}
-          <div className={scss.logo} onClick={() => go("/")}>
-            <div className={scss.logoIcon}>
-              <Zap size={16} />
-            </div>
-            <span className={scss.logoText}>SALLIX</span>
-          </div>
 
-          {/* Store pill */}
-          {shop ? (
-            <div className={scss.storePill}>
-              <div className={scss.storeDot} />
-              <span>{shop.name}</span>
+          {/* Logo */}
+          <motion.div
+            className={scss.logo}
+            onClick={() => go("/")}
+            whileHover={shouldAnimate ? { scale: motionTokens.scale.pop } : undefined}
+            whileTap={shouldAnimate  ? { scale: motionTokens.scale.press } : undefined}
+            transition={springs.snappy}
+          >
+            <div className={scss.logoIcon}>
+              <Zap size={17} />
             </div>
-          ) : (
-            <div className={scss.storePill}>
-              <div className={`${scss.storeDot} ${scss.dotOff}`} />
-              <span>Нет магазина</span>
+            <div className={scss.logoWords}>
+              <span className={scss.logoText}>SALLIX</span>
+              <span className={scss.logoBadge}>Seller</span>
             </div>
-          )}
+          </motion.div>
+
+          {/* Store chip */}
+          <div className={scss.storeChip}>
+            <span className={`${scss.storeDot} ${shop ? "" : scss.dotOff}`} />
+            <span className={scss.storeName}>{shop?.name ?? "Нет магазина"}</span>
+          </div>
 
           {/* Navigation */}
           <nav className={scss.nav}>
-            <div className={scss.navLabel}>Навигация</div>
-            {NAV.map(({ label, path, icon: Icon }) => (
-              <button
-                key={path}
-                className={`${scss.navItem} ${isActive(path) ? scss.active : ""}`}
-                onClick={() => go(path)}
-              >
-                <Icon size={15} className={scss.navIcon} />
-                <span>{label}</span>
-                {isActive(path) && <ChevronRight size={12} className={scss.chevron} />}
-              </button>
-            ))}
+            <motion.ul
+              className={scss.navList}
+              variants={shouldAnimate ? containerVariants : undefined}
+              initial={shouldAnimate ? "hidden" : false}
+              animate="visible"
+            >
+              {NAV.map(({ label, path, icon: Icon }) => {
+                const active = isActive(path);
+                return (
+                  <motion.li
+                    key={path}
+                    variants={shouldAnimate ? itemVariants : undefined}
+                    className={scss.navLi}
+                  >
+                    <motion.button
+                      className={`${scss.navItem} ${active ? scss.active : ""}`}
+                      onClick={() => go(path)}
+                      whileHover={shouldAnimate && !active
+                        ? { x: motionTokens.distance.xs, transition: springs.snappy }
+                        : undefined
+                      }
+                      whileTap={shouldAnimate
+                        ? { scale: motionTokens.scale.subtle, transition: springs.instant }
+                        : undefined
+                      }
+                    >
+                      {/* Sliding background pill */}
+                      {active && (
+                        <motion.span
+                          className={scss.activePill}
+                          layoutId="activeNavPill"
+                          transition={springs.snappy}
+                        />
+                      )}
+                      <Icon size={16} className={scss.navIcon} />
+                      <span className={scss.navLabel}>{label}</span>
+                    </motion.button>
+                  </motion.li>
+                );
+              })}
+            </motion.ul>
           </nav>
 
-          {/* Bottom user block */}
+          {/* Bottom */}
           <div className={scss.bottomBlock}>
-            <button className={scss.profileBtn} onClick={() => go("/profile")}>
+            <motion.button
+              className={scss.profileBtn}
+              onClick={() => go("/profile")}
+              whileHover={shouldAnimate ? { backgroundColor: "var(--bg-3)" } : undefined}
+              transition={{ duration: motionTokens.duration.fast }}
+            >
               <div className={scss.avatar}>{initials}</div>
               <div className={scss.userInfo}>
                 <span className={scss.userName}>{name}</span>
                 <span className={scss.userEmail}>{email}</span>
               </div>
-            </button>
-            <button className={scss.themeBtn} onClick={toggleTheme} aria-label="Сменить тему">
-              {isDark ? <Sun size={14} /> : <Moon size={14} />}
-            </button>
-            <button className={scss.logoutBtn} onClick={handleLogout} aria-label="Выйти">
-              <LogOut size={14} />
-            </button>
+            </motion.button>
+
+            <div className={scss.bottomActions}>
+              <motion.button
+                className={scss.iconBtn}
+                onClick={toggleTheme}
+                aria-label="Сменить тему"
+                whileHover={shouldAnimate ? { scale: motionTokens.scale.pop } : undefined}
+                whileTap={shouldAnimate   ? { scale: motionTokens.scale.press } : undefined}
+                transition={springs.snappy}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={isDark ? "sun" : "moon"}
+                    initial={shouldAnimate ? { opacity: 0, rotate: -45 } : false}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={shouldAnimate    ? { opacity: 0, rotate: 45 }  : undefined}
+                    transition={{ duration: motionTokens.duration.fast }}
+                  >
+                    {isDark ? <Sun size={15} /> : <Moon size={15} />}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.button>
+
+              <motion.button
+                className={`${scss.iconBtn} ${scss.iconBtnDanger}`}
+                onClick={handleLogout}
+                aria-label="Выйти"
+                whileHover={shouldAnimate ? { scale: motionTokens.scale.pop } : undefined}
+                whileTap={shouldAnimate   ? { scale: motionTokens.scale.press } : undefined}
+                transition={springs.snappy}
+              >
+                <LogOut size={15} />
+              </motion.button>
+            </div>
           </div>
+
         </div>
       </aside>
 
       {/* ─── Mobile drawer ──────────────────────────────────── */}
-      {mobile && (
-        <div className={scss.backdrop} onClick={() => setMobile(false)} />
-      )}
-      <div className={`${scss.drawer} ${mobile ? scss.drawerOpen : ""}`}>
+      <AnimatePresence>
+        {mobile && (
+          <motion.div
+            className={scss.backdrop}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: motionTokens.duration.fast }}
+            onClick={() => setMobile(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className={scss.drawer}
+        initial={false}
+        animate={{ x: mobile ? 0 : "-100%" }}
+        transition={springs.gentle}
+      >
         <div className={scss.drawerHead}>
-          <div className={scss.logo}>
+          <div className={scss.logo} onClick={() => go("/")}>
             <div className={scss.logoIcon}><Zap size={14} /></div>
             <span className={scss.logoText}>SALLIX</span>
           </div>
@@ -143,7 +241,7 @@ const Header: FC = () => {
 
         {shop && (
           <div className={scss.drawerStore}>
-            <div className={scss.storeDot} />
+            <span className={scss.storeDot} />
             <span>{shop.name}</span>
           </div>
         )}
@@ -174,7 +272,7 @@ const Header: FC = () => {
             Выйти
           </button>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };

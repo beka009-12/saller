@@ -2,7 +2,10 @@
 import { FC } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Package, SendHorizontal, CheckCheck, XCircle } from 'lucide-react';
-import { usePatchShopsOrdersOrderIdAdvance } from '@/src/api/generated/endpoints/shops/shops';
+import {
+  usePatchShopsOrdersOrderIdAdvance,
+  getGetShopsOrdersQueryKey,
+} from '@/src/api/generated/endpoints/shops/shops';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import type { ShopOrder } from './OrderListItem';
@@ -47,7 +50,7 @@ const OrderPanel: FC<Props> = ({ order, reduce }) => {
       {
         onSuccess: () => {
           toast.success('Статус обновлён');
-          queryClient.invalidateQueries({ queryKey: ['/shops/orders'] });
+          queryClient.invalidateQueries({ queryKey: getGetShopsOrdersQueryKey() });
         },
         onError: () => toast.error('Ошибка при обновлении статуса'),
       }

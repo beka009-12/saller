@@ -50,32 +50,24 @@ const OrderList: FC<Props> = ({ orders, selectedId, onSelect, loading, reduce })
   }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}
-    >
-      <AnimatePresence mode="popLayout">
-        {orders.map((order) => (
-          <motion.div
-            key={order.id}
-            variants={{
-              hidden:  { opacity: 0, y: 10 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.28, ease: smooth } },
-            }}
-            exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            layout={!reduce}
-          >
-            <OrderListItem
-              order={order}
-              isSelected={selectedId === order.id}
-              onClick={() => onSelect(order.id)}
-              reduce={reduce}
-            />
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </motion.div>
+    <AnimatePresence mode="popLayout">
+      {orders.map((order, i) => (
+        <motion.div
+          key={order.id}
+          initial={reduce ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 0.28, delay: i * 0.05, ease: smooth } }}
+          exit={{ opacity: 0, transition: { duration: 0.15 } }}
+          layout={!reduce}
+        >
+          <OrderListItem
+            order={order}
+            isSelected={selectedId === order.id}
+            onClick={() => onSelect(order.id)}
+            reduce={reduce}
+          />
+        </motion.div>
+      ))}
+    </AnimatePresence>
   );
 };
 

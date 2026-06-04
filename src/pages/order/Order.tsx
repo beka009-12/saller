@@ -82,13 +82,12 @@ const Order: FC = () => {
   }, [rawOrders, period, search]);
 
   useEffect(() => {
-    if (!selectedId && displayOrders.length > 0) {
-      setSelectedId(displayOrders[0].id);
-    }
-    if (selectedId && !displayOrders.find(o => o.id === selectedId)) {
-      setSelectedId(displayOrders[0]?.id ?? null);
-    }
-  }, [displayOrders]); // eslint-disable-line react-hooks/exhaustive-deps
+    setSelectedId(prev => {
+      if (!prev && displayOrders.length > 0) return displayOrders[0].id;
+      if (prev && !displayOrders.find(o => o.id === prev)) return displayOrders[0]?.id ?? null;
+      return prev;
+    });
+  }, [displayOrders]);
 
   const selectedOrder = displayOrders.find(o => o.id === selectedId) ?? null;
 

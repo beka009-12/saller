@@ -65,7 +65,7 @@
   border: none;
   cursor: pointer;
   background: var(--accent);
-  color: #000;
+  color: #fff;
   transition: opacity 0.2s, transform 0.1s;
 
   &:hover { opacity: 0.85; transform: translateY(-1px); }

@@ -31,7 +31,7 @@
     .progressCircle {
       background: var(--accent);
       border-color: var(--accent);
-      color: #000;
+      color: #fff;
     }
     span {
       color: var(--text-0);
@@ -43,7 +43,7 @@
     .progressCircle {
       background: var(--green);
       border-color: var(--green);
-      color: #000;
+      color: #fff;
     }
     span { color: var(--green); }
   }
@@ -163,7 +163,7 @@
 
   button {
     background: var(--accent);
-    color: #000;
+    color: #fff;
     border: none;
     border-radius: var(--r-sm);
     width: 38px;
@@ -257,7 +257,7 @@
   top: 6px;
   left: 6px;
   background: var(--accent);
-  color: #000;
+  color: #fff;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 7px;
@@ -410,7 +410,7 @@
   cursor: pointer;
   background: var(--accent);
   border: none;
-  color: #000;
+  color: #fff;
   margin-left: auto;
   transition: opacity 0.14s;
 
@@ -426,7 +426,7 @@
   cursor: pointer;
   background: var(--green);
   border: none;
-  color: #000;
+  color: #fff;
   margin-left: auto;
   transition: opacity 0.14s;
 
@@ -508,7 +508,7 @@
 
 .btnAddColor {
   background: var(--accent);
-  color: #000;
+  color: #fff;
   border: none;
   border-radius: var(--r-sm);
   padding: 0 14px;

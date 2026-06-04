@@ -3,6 +3,7 @@ import { FC, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import scss from "./Card.module.scss";
 import CardButtons from "@/src/ui/card-buttons/CardButtons";
+import ConfirmModal from "@/src/components/ui/ConfirmModal";
 import { Product } from "@/src/api/generated/models/product";
 import { useDeleteCommodityProductDeleteId } from "@/src/api/generated/endpoints/product/product";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,11 +17,16 @@ interface CardProps {
 const Card: FC<CardProps> = ({ product, onEdit }) => {
   const { mutate: deleteProduct } = useDeleteCommodityProductDeleteId();
   const queryClient = useQueryClient();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleDelete = (id: number) => {
-    if (!confirm("Удалить товар?")) return;
+    setConfirmOpen(true);
+  };
+
+  const doDelete = () => {
+    setConfirmOpen(false);
     deleteProduct(
-      { id },
+      { id: product.id! },
       {
         onSuccess: () => {
           toast.success("Товар удалён");
@@ -108,6 +114,16 @@ const Card: FC<CardProps> = ({ product, onEdit }) => {
           />
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        title="Удалить товар?"
+        message="Это действие нельзя отменить. Товар будет удалён из каталога."
+        confirmLabel="Удалить"
+        variant="danger"
+        onConfirm={doDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 };

@@ -19,6 +19,7 @@ import {
   Shield,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/src/components/ui/ConfirmModal";
 
 const Settings: FC = () => {
   const { data: seller, isLoading } = useCurrentSeller();
@@ -43,8 +44,9 @@ const Settings: FC = () => {
     phone: "",
   });
 
-  const [storeSaved, setStoreSaved] = useState(false);
-  const [profileSaved, setProfileSaved] = useState(false);
+  const [storeSaved,      setStoreSaved]      = useState(false);
+  const [profileSaved,    setProfileSaved]    = useState(false);
+  const [deactivateOpen,  setDeactivateOpen]  = useState(false);
   const logoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -124,6 +126,7 @@ const Settings: FC = () => {
   }
 
   return (
+    <>
     <div className={scss.Settings}>
       <div className="container">
         <div className={scss.pageHeader}>
@@ -359,17 +362,7 @@ const Settings: FC = () => {
                     className={scss.dangerBtn}
                     type="button"
                     disabled={deactivating}
-                    onClick={() => {
-                      if (!confirm("Деактивировать магазин? Все активные заказы будут отменены.")) return;
-                      deactivateShop(undefined, {
-                        onSuccess: () => {
-                          toast.success("Магазин деактивирован");
-                          queryClient.invalidateQueries({ queryKey: ["/user/profile"] });
-          queryClient.invalidateQueries({ queryKey: ["/shops/my"] });
-                        },
-                        onError: () => toast.error("Ошибка при деактивации"),
-                      });
-                    }}
+                    onClick={() => setDeactivateOpen(true)}
                   >
                     {deactivating ? "Деактивация..." : "Деактивировать магазин"}
                   </button>
@@ -398,6 +391,28 @@ const Settings: FC = () => {
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      open={deactivateOpen}
+      title="Деактивировать магазин?"
+      message="Все активные заказы будут отменены. Магазин скроется из каталога. Вы сможете реактивировать его в любое время."
+      confirmLabel="Деактивировать"
+      cancelLabel="Не сейчас"
+      variant="warning"
+      onConfirm={() => {
+        setDeactivateOpen(false);
+        deactivateShop(undefined, {
+          onSuccess: () => {
+            toast.success("Магазин деактивирован");
+            queryClient.invalidateQueries({ queryKey: ["/user/profile"] });
+            queryClient.invalidateQueries({ queryKey: ["/shops/my"] });
+          },
+          onError: () => toast.error("Ошибка при деактивации"),
+        });
+      }}
+      onCancel={() => setDeactivateOpen(false)}
+    />
+    </>
   );
 };
 

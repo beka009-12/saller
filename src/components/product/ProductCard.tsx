@@ -6,6 +6,7 @@ import { Edit2, Trash2, ImageOff, Tag } from "lucide-react";
 import { useDeleteCommodityProductDeleteId } from "@/src/api/generated/endpoints/product/product";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import ConfirmModal from "@/src/components/ui/ConfirmModal";
 import scss from "@/src/components/product/ProductCard.module.scss";
 
 interface ProductCardProps {
@@ -36,7 +37,8 @@ const ProductCard: FC<ProductCardProps> = ({ product, onEdit, reduce }) => {
   const { mutate: deleteProduct } = useDeleteCommodityProductDeleteId();
   const queryClient = useQueryClient();
   const scrollRef   = useRef<HTMLDivElement>(null);
-  const [activeImg, setActiveImg] = useState(0);
+  const [activeImg,    setActiveImg]    = useState(0);
+  const [confirmOpen,  setConfirmOpen]  = useState(false);
 
   const images     = product.images ?? [];
   const price      = Number(product.price ?? 0);
@@ -53,8 +55,10 @@ const ProductCard: FC<ProductCardProps> = ({ product, onEdit, reduce }) => {
     return () => el.removeEventListener("scroll", onScroll);
   }, [images.length]);
 
-  const handleDelete = () => {
-    if (!confirm(`Удалить «${product.title}»?`)) return;
+  const handleDelete = () => setConfirmOpen(true);
+
+  const doDelete = () => {
+    setConfirmOpen(false);
     deleteProduct(
       { id: product.id },
       {
@@ -71,6 +75,7 @@ const ProductCard: FC<ProductCardProps> = ({ product, onEdit, reduce }) => {
     stock === 0 ? "out" : stock <= 5 ? "low" : "ok";
 
   return (
+    <>
     <motion.article
       className={scss.card}
       variants={cardVariants}
@@ -198,6 +203,17 @@ const ProductCard: FC<ProductCardProps> = ({ product, onEdit, reduce }) => {
         </div>
       </div>
     </motion.article>
+
+    <ConfirmModal
+      open={confirmOpen}
+      title={`Удалить «${product.title}»?`}
+      message="Это действие нельзя отменить. Товар будет удалён из каталога."
+      confirmLabel="Удалить"
+      variant="danger"
+      onConfirm={doDelete}
+      onCancel={() => setConfirmOpen(false)}
+    />
+    </>
   );
 };
 

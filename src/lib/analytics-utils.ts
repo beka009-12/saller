@@ -24,6 +24,7 @@ export interface Stats {
 export interface ChartPoint {
   date: string;
   revenue: number;
+  orders: number;
 }
 
 export interface TopProduct {
@@ -68,6 +69,7 @@ export function buildChartData(orders: AnyOrder[], period: Period): ChartPoint[]
     return {
       date: new Date(ms).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' }),
       revenue: 0,
+      orders: 0,
     };
   });
 
@@ -78,6 +80,7 @@ export function buildChartData(orders: AnyOrder[], period: Period): ChartPoint[]
     const dayIndex = Math.floor((orderMs - firstDayMs) / DAY_MS);
     if (dayIndex >= 0 && dayIndex < days) {
       points[dayIndex].revenue += Number(order.finalAmount ?? 0);
+      points[dayIndex].orders  += 1;
     }
   }
 

@@ -1,7 +1,8 @@
-// src/pages/analytics/components/TopProducts.tsx
 'use client';
 import { FC } from 'react';
-import { Package } from 'lucide-react';
+import Link from 'next/link';
+import { TrendingUp } from 'lucide-react';
+import { motion } from 'motion/react';
 import type { TopProduct } from '@/src/lib/analytics-utils';
 
 interface TopProductsProps {
@@ -9,125 +10,142 @@ interface TopProductsProps {
   loading: boolean;
 }
 
-const fmt = (n: number) =>
+const smooth: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const fmtKGS = (n: number) =>
   new Intl.NumberFormat('ru-KG', {
     style: 'currency',
     currency: 'KGS',
     maximumFractionDigits: 0,
   }).format(n);
 
-const TopProducts: FC<TopProductsProps> = ({ products, loading }) => (
-  <div
-    style={{
-      background: 'var(--bg-2)',
-      border: '1px solid var(--border-strong)',
-      borderRadius: 'var(--r-md)',
-      padding: '20px',
-      marginBottom: '20px',
-      opacity: loading ? 0.5 : 1,
-      transition: 'opacity 0.2s',
-    }}
-  >
+const RANK_COLORS = ['#5533EB', '#2563EB', '#7C3AED', '#0EA5E9', '#6366F1'];
+
+const TopProducts: FC<TopProductsProps> = ({ products, loading }) => {
+  const maxUnits = products[0]?.unitsSold ?? 1;
+
+  return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        marginBottom: 16,
-        fontSize: 13,
-        fontWeight: 600,
-        color: 'var(--text-0)',
+        background: 'var(--bg-2)',
+        border: '1px solid var(--border-strong)',
+        borderRadius: 'var(--r-lg)',
+        padding: '20px',
+        marginBottom: '20px',
+        opacity: loading ? 0.5 : 1,
+        transition: 'opacity 0.2s',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
     >
-      <Package size={14} />
-      Топ товаров по продажам
-    </div>
-
-    {products.length === 0 ? (
-      <div style={{ fontSize: 13, color: 'var(--text-2)', padding: '8px 0' }}>
-        {loading ? 'Загрузка...' : 'Нет продаж за период'}
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+        <TrendingUp size={14} style={{ color: 'var(--accent)' }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-0)' }}>
+          Топ товаров по продажам
+        </span>
       </div>
-    ) : (
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-        <thead>
-          <tr>
-            {['Товар', 'Продано (шт)', 'Выручка'].map((h) => (
-              <th
-                key={h}
+
+      {products.length === 0 ? (
+        <div style={{ fontSize: 13, color: 'var(--text-2)', padding: '16px 0', textAlign: 'center' }}>
+          {loading ? 'Загрузка...' : 'Нет продаж за период'}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {products.map((p, i) => {
+            const pct = maxUnits > 0 ? (p.unitsSold / maxUnits) * 100 : 0;
+            const color = RANK_COLORS[i] ?? '#888';
+
+            return (
+              <motion.div
+                key={p.productId}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.06, ease: smooth }}
                 style={{
-                  textAlign: h === 'Товар' ? 'left' : 'right',
-                  padding: '0 0 10px',
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: 'var(--text-2)',
-                  borderBottom: '1px solid var(--border-strong)',
+                  background: 'var(--bg-1)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
                 }}
               >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p, i) => (
-            <tr key={p.productId}>
-              <td
-                style={{
-                  padding: '10px 0',
-                  color: 'var(--text-0)',
-                  borderBottom: i < products.length - 1 ? '1px solid var(--border-strong)' : 'none',
-                  maxWidth: 240,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span
+                {/* Rank badge */}
+                <div
                   style={{
-                    display: 'inline-block',
-                    width: 18,
-                    height: 18,
-                    lineHeight: '18px',
-                    textAlign: 'center',
-                    borderRadius: 4,
-                    background: 'var(--bg-3, var(--bg-2))',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: 'var(--text-2)',
-                    marginRight: 8,
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: `${color}18`,
+                    border: `1.5px solid ${color}40`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color,
+                    flexShrink: 0,
+                    fontFamily: 'var(--font-mono)',
                   }}
                 >
                   {i + 1}
-                </span>
-                {p.title}
-              </td>
-              <td
-                style={{
-                  padding: '10px 0',
-                  textAlign: 'right',
-                  fontWeight: 600,
-                  color: 'var(--text-0)',
-                  borderBottom: i < products.length - 1 ? '1px solid var(--border-strong)' : 'none',
-                }}
-              >
-                {p.unitsSold}
-              </td>
-              <td
-                style={{
-                  padding: '10px 0',
-                  textAlign: 'right',
-                  color: 'var(--text-2)',
-                  borderBottom: i < products.length - 1 ? '1px solid var(--border-strong)' : 'none',
-                }}
-              >
-                {fmt(p.revenue)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )}
-  </div>
-);
+                </div>
+
+                {/* Main content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Title + stats row */}
+                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
+                    <Link
+                      href={`/products/${p.productId}`}
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: 'var(--text-0)',
+                        textDecoration: 'none',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: 1,
+                        minWidth: 0,
+                      }}
+                    >
+                      {p.title}
+                    </Link>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color, fontFamily: 'var(--font-mono)' }}>
+                        {p.unitsSold} шт
+                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--font-mono)' }}>
+                        {fmtKGS(p.revenue)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div
+                    style={{
+                      height: 4,
+                      background: 'var(--bg-4)',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <motion.div
+                      style={{ height: '100%', background: color, borderRadius: 2 }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.6, delay: i * 0.08, ease: smooth }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default TopProducts;

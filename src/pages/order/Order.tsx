@@ -1,280 +1,193 @@
-"use client";
-import { FC, useState } from "react";
-import scss from "./Order.module.scss";
-import { useGetShopsOrders, usePatchShopsOrdersOrderIdAdvance } from "@/src/api/generated/endpoints/shops/shops";
-import type { OrderStatus } from "@/src/api/generated/models";
-import toast from "react-hot-toast";
+'use client';
+import { FC, useMemo, useState, useEffect } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
+import { Search, ShoppingBag, Clock } from 'lucide-react';
+import { useGetShopsOrders } from '@/src/api/generated/endpoints/shops/shops';
+import type { OrderStatus } from '@/src/api/generated/models';
+import scss from './Order.module.scss';
+import OrderList from '@/src/components/order/OrderList';
+import OrderPanel from '@/src/components/order/OrderPanel';
+import type { ShopOrder } from '@/src/components/order/OrderListItem';
 
-interface ShopOrderItem {
-  id: number;
-  priceAtBuy: number;
-  quantity: number;
-  product: { id: number; title: string; price: number; newPrice?: number | null };
-}
+type WorkflowTab = 'needs_shipping' | 'in_transit' | 'completed' | 'canceled' | 'all';
+type DatePeriod  = 'today' | 'week' | 'month';
 
-interface ShopOrder {
-  id: number;
-  status: OrderStatus;
-  createdAt: string;
-  finalAmount: number;
-  deliveryName: string;
-  deliveryPhone: string;
-  deliveryAddress: string;
-  items: ShopOrderItem[];
-}
-
-const STATUS_LABEL: Record<OrderStatus, string> = {
-  PENDING: "Новый",
-  PAID: "Оплачен",
-  PROCESSING: "В обработке",
-  SHIPPED: "Отправлен",
-  COMPLETED: "Завершён",
-  CANCELED: "Отменён",
-};
-
-const STATUS_NEXT: Partial<Record<OrderStatus, OrderStatus>> = {
-  PAID: "SHIPPED",
-  SHIPPED: "COMPLETED",
-};
-
-const STATUS_NEXT_LABEL: Partial<Record<OrderStatus, string>> = {
-  PAID: "Отметить отправленным",
-  SHIPPED: "Отметить завершённым",
-};
-
-const fmt = (n: number) =>
-  new Intl.NumberFormat("ru-KG", {
-    style: "currency",
-    currency: "KGS",
-    maximumFractionDigits: 0,
-  }).format(n);
-
-const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-const FILTERS: { label: string; value: OrderStatus | "ALL" }[] = [
-  { label: "Все", value: "ALL" },
-  { label: "Оплачены", value: "PAID" },
-  { label: "Отправлены", value: "SHIPPED" },
-  { label: "Завершены", value: "COMPLETED" },
-  { label: "Отменены", value: "CANCELED" },
+const TABS: { value: WorkflowTab; label: string; statuses: OrderStatus[]; emoji: string }[] = [
+  { value: 'needs_shipping', label: 'Надо отправить', statuses: ['PAID'],      emoji: '⚡' },
+  { value: 'in_transit',     label: 'В пути',          statuses: ['SHIPPED'],   emoji: '🚚' },
+  { value: 'completed',      label: 'Завершённые',     statuses: ['COMPLETED'], emoji: '✓' },
+  { value: 'canceled',       label: 'Отменённые',      statuses: ['CANCELED'],  emoji: '✕' },
+  { value: 'all',            label: 'Все',             statuses: [],            emoji: '' },
 ];
 
+const DATE_BTNS: { value: DatePeriod; label: string }[] = [
+  { value: 'today', label: 'Сегодня' },
+  { value: 'week',  label: 'Неделя' },
+  { value: 'month', label: 'Месяц' },
+];
+
+const smooth: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+function getPeriodCutoff(period: DatePeriod): number {
+  const now = new Date();
+  const todayMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if (period === 'today') return todayMs;
+  if (period === 'week')  return todayMs - 6  * 24 * 60 * 60 * 1000;
+  return                         todayMs - 29 * 24 * 60 * 60 * 1000;
+}
+
 const Order: FC = () => {
-  const [filter, setFilter] = useState<OrderStatus | "ALL">("ALL");
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const reduce = useReducedMotion() ?? false;
 
-  const { data, isLoading } = useGetShopsOrders(
-    filter !== "ALL" ? { status: filter as OrderStatus } : undefined,
+  const [tab,        setTab]        = useState<WorkflowTab>('needs_shipping');
+  const [period,     setPeriod]     = useState<DatePeriod>('week');
+  const [search,     setSearch]     = useState('');
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const { data: allData }                      = useGetShopsOrders(undefined);
+  const { data: filteredData, isLoading }      = useGetShopsOrders(
+    tab !== 'all'
+      ? { status: TABS.find(t => t.value === tab)?.statuses[0] }
+      : undefined
   );
-  const { mutate: advance, isPending: advancing } = usePatchShopsOrdersOrderIdAdvance();
 
-  const orders = (data?.orders ?? []) as ShopOrder[];
+  const allOrders = (allData?.orders  ?? []) as ShopOrder[];
+  const rawOrders = (filteredData?.orders ?? []) as ShopOrder[];
 
-  const counts: Record<string, number> = {};
-  const { data: allData } = useGetShopsOrders();
-  ((allData?.orders ?? []) as ShopOrder[]).forEach((o) => {
-    counts[o.status] = (counts[o.status] || 0) + 1;
-  });
-  counts["ALL"] = allData?.total ?? 0;
+  const tabCounts = useMemo(() => {
+    const counts: Record<WorkflowTab, number> = {
+      needs_shipping: 0, in_transit: 0, completed: 0, canceled: 0, all: allOrders.length,
+    };
+    for (const o of allOrders) {
+      if (o.status === 'PAID')      counts.needs_shipping++;
+      if (o.status === 'SHIPPED')   counts.in_transit++;
+      if (o.status === 'COMPLETED') counts.completed++;
+      if (o.status === 'CANCELED')  counts.canceled++;
+    }
+    return counts;
+  }, [allOrders]);
 
-  const handleAdvance = (orderId: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    advance({ orderId }, {
-      onSuccess: () => toast.success("Статус обновлён"),
-      onError: () => toast.error("Ошибка при обновлении статуса"),
-    });
-  };
+  const displayOrders = useMemo(() => {
+    const cutoff = getPeriodCutoff(period);
+    let list = rawOrders.filter(o => new Date(o.createdAt).getTime() >= cutoff);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      if (q.startsWith('#')) {
+        list = list.filter(o => String(o.id).includes(q.slice(1)));
+      } else {
+        list = list.filter(o => o.deliveryName.toLowerCase().includes(q));
+      }
+    }
+    return list;
+  }, [rawOrders, period, search]);
 
-  const toggleExpand = (id: number) => setExpanded(expanded === id ? null : id);
+  useEffect(() => {
+    if (!selectedId && displayOrders.length > 0) {
+      setSelectedId(displayOrders[0].id);
+    }
+    if (selectedId && !displayOrders.find(o => o.id === selectedId)) {
+      setSelectedId(displayOrders[0]?.id ?? null);
+    }
+  }, [displayOrders]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const renderDetail = (order: ShopOrder) => (
-    <div className={scss.detail}>
-      <div className={scss.detailGrid}>
-        <div className={scss.detailBlock}>
-          <p className={scss.dlabel}>Доставить</p>
-          <p className={scss.dval}>{order.deliveryAddress}</p>
-          <p className={scss.dsub}>{order.deliveryName}</p>
-          <p className={scss.dsub}>{order.deliveryPhone}</p>
-        </div>
+  const selectedOrder = displayOrders.find(o => o.id === selectedId) ?? null;
 
-        <div className={scss.detailBlock}>
-          <p className={scss.dlabel}>Состав</p>
-          <table className={scss.itemsTable}>
-            <tbody>
-              {order.items.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.product.title}</td>
-                  <td className={scss.tdQty}>{item.quantity} шт.</td>
-                  <td className={scss.tdPrice}>
-                    {fmt(Number(item.priceAtBuy) * item.quantity)}
-                  </td>
-                </tr>
-              ))}
-              <tr className={scss.trTotal}>
-                <td colSpan={2}>Итого</td>
-                <td className={scss.tdPrice}>{fmt(Number(order.finalAmount))}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className={scss.detailBlock}>
-          <p className={scss.dlabel}>Действие</p>
-          <p className={scss.dsub}>Создан: {fmtDate(order.createdAt)}</p>
-          <p className={scss.dsub}>
-            Статус: <b>{STATUS_LABEL[order.status]}</b>
-          </p>
-          {STATUS_NEXT[order.status] && (
-            <button
-              className={scss.actionBtn}
-              disabled={advancing}
-              onClick={(e) => handleAdvance(order.id, e)}
-            >
-              {STATUS_NEXT_LABEL[order.status]}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  const paidCount    = tabCounts.needs_shipping;
+  const pendingCount = allOrders.filter(o => o.status === 'PENDING').length;
 
   return (
-    <div className={scss.Order}>
-      <div className="container">
-        <header className={scss.header}>
-          <div className={scss.headerLeft}>
-            <h1>Заказы</h1>
-          </div>
-          <div className={scss.stats}>
-            <div className={scss.stat}>
-              <span className={scss.statNum}>{counts["PAID"] || 0}</span>
-              <span className={scss.statLabel}>Надо отправить</span>
+    <div className={scss.page}>
+      <motion.div
+        className={scss.header}
+        initial={reduce ? false : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.32, ease: smooth }}
+      >
+        <div>
+          <h1>Заказы</h1>
+          <p>{allOrders.length} всего</p>
+        </div>
+        <div className={scss.chips}>
+          {paidCount > 0 && (
+            <div className={`${scss.chip} ${scss.chipAmber}`}>
+              <ShoppingBag size={12} />
+              {paidCount} надо отправить
             </div>
-            <div className={scss.statDivider} />
-            <div className={scss.stat}>
-              <span className={scss.statNum}>{counts["PENDING"] || 0}</span>
-              <span className={scss.statLabel}>Ожидают оплаты</span>
+          )}
+          {pendingCount > 0 && (
+            <div className={`${scss.chip} ${scss.chipBlue}`}>
+              <Clock size={12} />
+              {pendingCount} ожидают оплаты
             </div>
-            <div className={scss.statDivider} />
-            <div className={scss.stat}>
-              <span className={scss.statNum}>
-                {fmt(
-                  ((allData?.orders ?? []) as ShopOrder[])
-                    .filter((o) => o.status !== "CANCELED")
-                    .reduce((s, o) => s + Number(o.finalAmount), 0),
-                )}
-              </span>
-              <span className={scss.statLabel}>Выручка</span>
-            </div>
-          </div>
-        </header>
+          )}
+        </div>
+      </motion.div>
 
-        <div className={scss.filters}>
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              className={`${scss.filterBtn} ${filter === f.value ? scss.filterActive : ""}`}
-              onClick={() => setFilter(f.value)}
+      <motion.div
+        className={scss.filterBar}
+        initial={reduce ? false : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.08, ease: smooth }}
+      >
+        <div className={scss.searchWrap}>
+          <Search size={14} className={scss.searchIcon} />
+          <input
+            className={scss.searchInput}
+            placeholder="Поиск по имени или #номеру…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className={scss.tabs}>
+          {TABS.map(({ value, label, emoji }) => (
+            <motion.button
+              key={value}
+              className={`${scss.tab} ${tab === value ? scss.tabActive : ''} ${value === 'canceled' ? scss.tabCanceled : ''}`}
+              onClick={() => { setTab(value); setSelectedId(null); }}
+              whileTap={reduce ? undefined : { scale: 0.95 }}
             >
-              {f.label}
-              {(counts[f.value] || 0) > 0 && (
-                <span
-                  className={`${scss.badge} ${filter === f.value ? scss.badgeActive : ""}`}
-                >
-                  {counts[f.value]}
-                </span>
+              {emoji && <span>{emoji}</span>}
+              {label}
+              {tabCounts[value] > 0 && (
+                <span className={scss.tabCount}>{tabCounts[value]}</span>
               )}
-            </button>
+            </motion.button>
           ))}
         </div>
 
-        {isLoading ? (
-          <div className={scss.empty}>Загрузка...</div>
-        ) : orders.length === 0 ? (
-          <div className={scss.empty}>Нет заказов</div>
-        ) : (
-          <div className={scss.table}>
-            <div className={scss.tableHead}>
-              <span>Заказ</span>
-              <span>Покупатель</span>
-              <span>Товары</span>
-              <span>Адрес</span>
-              <span>Сумма</span>
-              <span>Статус</span>
-              <span />
-            </div>
+        <div className={scss.datePicker}>
+          {DATE_BTNS.map(({ value, label }) => (
+            <button
+              key={value}
+              className={`${scss.dateBtn} ${period === value ? scss.dateBtnActive : ''}`}
+              onClick={() => setPeriod(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </motion.div>
 
-            {orders.map((order) => (
-              <div key={order.id} className={scss.rowWrap}>
-                <div
-                  className={`${scss.row} ${expanded === order.id ? scss.rowOpen : ""}`}
-                  onClick={() => toggleExpand(order.id)}
-                >
-                  <span className={scss.orderId}>#{order.id}</span>
-                  <span className={scss.buyer}>
-                    <b>{order.deliveryName}</b>
-                    <small>{order.deliveryPhone}</small>
-                  </span>
-                  <span className={scss.items}>
-                    {order.items.map((item) => (
-                      <span key={item.id} className={scss.itemChip}>
-                        {item.product.title} <em>×{item.quantity}</em>
-                      </span>
-                    ))}
-                  </span>
-                  <span className={scss.address}>{order.deliveryAddress}</span>
-                  <span className={scss.total}>{fmt(Number(order.finalAmount))}</span>
-                  <span className={`${scss.status} ${scss[`s_${order.status}`]}`}>
-                    {STATUS_LABEL[order.status]}
-                  </span>
-                  <span className={scss.chevron}>
-                    {expanded === order.id ? "▲" : "▼"}
-                  </span>
-                </div>
-
-                <div
-                  className={`${scss.mobileCard} ${expanded === order.id ? scss.mobileCardOpen : ""}`}
-                  onClick={() => toggleExpand(order.id)}
-                >
-                  <div className={scss.mobileCardTop}>
-                    <span className={scss.mobileCardId}>#{order.id}</span>
-                    <div className={scss.mobileCardBuyer}>
-                      <b>{order.deliveryName}</b>
-                      <small>{order.deliveryPhone}</small>
-                    </div>
-                    <span className={`${scss.status} ${scss[`s_${order.status}`]}`}>
-                      {STATUS_LABEL[order.status]}
-                    </span>
-                  </div>
-                  <div className={scss.items}>
-                    {order.items.map((item) => (
-                      <span key={item.id} className={scss.itemChip}>
-                        {item.product.title} <em>×{item.quantity}</em>
-                      </span>
-                    ))}
-                  </div>
-                  <div className={scss.mobileCardBottom}>
-                    <span className={scss.mobileCardTotal}>
-                      {fmt(Number(order.finalAmount))}
-                    </span>
-                    <span className={scss.mobileCardChevron}>
-                      {expanded === order.id ? "▲" : "▼"}
-                    </span>
-                  </div>
-                </div>
-
-                {expanded === order.id && renderDetail(order)}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <motion.div
+        className={scss.split}
+        initial={reduce ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.15, ease: smooth }}
+      >
+        <div className={scss.listCol}>
+          <OrderList
+            orders={displayOrders}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            loading={isLoading}
+            reduce={reduce}
+          />
+        </div>
+        <div className={scss.panelCol}>
+          <OrderPanel order={selectedOrder} reduce={reduce} />
+        </div>
+      </motion.div>
     </div>
   );
 };

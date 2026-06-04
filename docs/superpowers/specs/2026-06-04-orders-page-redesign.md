@@ -20,6 +20,7 @@ The current orders page uses an expanding table row for details — awkward to n
 | Search | Yes — by customer name or order ID (#number) |
 | Date filter | Yes — Today / Week / Month |
 | Side panel content | Contacts, address, items with prices, total, action button |
+| Filter approach | **Workflow tabs** — action-oriented labels, not raw statuses |
 
 ---
 
@@ -107,6 +108,24 @@ Sections:
 6. **Action button** — shown only when `STATUS_NEXT[order.status]` exists. `whileHover scale(1.02)` + `whileTap scale(0.97)`. Shows spinner while `advancing`.
 
 Panel entrance: `AnimatePresence mode="wait"` keyed by `order.id` — crossfade when switching orders.
+
+---
+
+## Workflow Tabs
+
+Tabs are ordered by seller action priority:
+
+| Tab label | Maps to status | Action available | Visual style |
+|---|---|---|---|
+| ⚡ Надо отправить | `PAID` | "Отметить отправленным" | Amber accent, count badge |
+| 🚚 В пути | `SHIPPED` | "Отметить завершённым" | Purple accent |
+| ✓ Завершённые | `COMPLETED` | None — read-only | Normal |
+| ✗ Отменённые | `CANCELED` | None — read-only | Dimmed (opacity 0.6), red tint on status pill |
+| Все | `ALL` | Depends on status | Normal |
+
+**PENDING orders:** Hidden from workflow tabs. Visible only in "Все". Seller cannot act on unpaid orders.
+
+**Cancelled tab purpose:** Seller needs to see cancelled orders to understand which orders won't be fulfilled (e.g. buyer cancelled after seeing shipping delay). Panel shows order details but action button is hidden.
 
 ---
 
